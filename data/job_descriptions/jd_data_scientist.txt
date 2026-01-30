@@ -1,0 +1,3 @@
+We are looking for a Data Scientist with 3+ years of experience.
+Skills required: Python, Machine Learning, SQL, AWS, Deep Learning.
+Must have experience with Flask and NLP.

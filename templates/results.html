@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block title %}Results - Bytewise Matcher{% endblock %}
+
+{% block content %}
+<style>
+    .leaderboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+
+    .jd-badge {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 8px 16px;
+        border-radius: 50px;
+        font-size: 0.9rem;
+        color: var(--secondary);
+        border: 1px solid var(--glass-border);
+    }
+
+    .rank-card {
+        padding: 20px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .rank-card:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: scale(1.01);
+    }
+
+    .rank-number {
+        font-size: 1.5rem;
+        font-weight: 800;
+        width: 40px;
+        color: var(--text-muted);
+    }
+
+    .rank-1 .rank-number {
+        color: #facc15;
+    }
+
+    /* Gold */
+    .rank-2 .rank-number {
+        color: #94a3b8;
+    }
+
+    /* Silver */
+    .rank-3 .rank-number {
+        color: #b45309;
+    }
+
+    /* Bronze */
+
+    .candidate-info {
+        flex: 1;
+        margin-left: 20px;
+    }
+
+    .candidate-name {
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+
+    .score-badge {
+        font-size: 1.2rem;
+        font-weight: 800;
+        color: #4ade80;
+    }
+
+    .details-panel {
+        display: none;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid var(--glass-border);
+        width: 100%;
+    }
+
+    .detail-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    @media (max-width: 768px) {
+        .detail-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .rank-card {
+            flex-wrap: wrap;
+        }
+    }
+
+    .skill-chip {
+        display: inline-block;
+        padding: 5px 12px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 20px;
+        margin: 3px;
+        font-size: 0.85rem;
+    }
+
+    .missing-chip {
+        color: #fca5a5;
+        border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+</style>
+
+<div class="leaderboard-header">
+    <h2>Analysis Results</h2>
+    <div class="jd-badge">Job: {{ jd_filename }}</div>
+</div>
+
+<div class="rank-list">
+    {% for res in results %}
+    <div class="glass-panel rank-card rank-{{ loop.index }}" onclick="toggleDetails('details-{{ loop.index }}')">
+        <div style="display: flex; align-items: center; width: 100%;">
+            <div class="rank-number">#{{ loop.index }}</div>
+            <div class="candidate-info">
+                <div class="candidate-name">{{ res.filename }}</div>
+                <div style="font-size: 0.9rem; color: var(--text-muted);">
+                    Exp Match: {{ res.score['Experience Match (%)'] }}% • Edu Match: {{ res.score['Education Match (%)']
+                    }}%
+                </div>
+            </div>
+            <div class="score-badge">{{ res.score['Final Score (%)'] }}%</div>
+        </div>
+
+        <div id="details-{{ loop.index }}" class="details-panel" onclick="event.stopPropagation()">
+            <div class="detail-grid">
+                <div>
+                    <h4 style="margin-bottom: 10px; color: var(--text-muted);">Matched Skills</h4>
+                    {% for skill in res.skills %}
+                    <span class="skill-chip">✅ {{ skill }}</span>
+                    {% endfor %}
+                    {% if not res.skills %}<p style="font-style: italic; color: #666;">None found</p>{% endif %}
+                </div>
+                <div>
+                    <h4 style="margin-bottom: 10px; color: var(--text-muted);">Missing / Recommended</h4>
+                    {% for skill, rec in res.gaps.items() %}
+                    <div class="skill-chip missing-chip">
+                        {{ skill }} <span style="opacity: 0.7;">({{ rec }})</span>
+                    </div>
+                    {% endfor %}
+                    {% if not res.gaps %}<p style="color: #4ade80;">Perfect match!</p>{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div style="text-align: center; margin-top: 40px;">
+    <a href="/" class="btn">Analyze New Batch</a>
+</div>
+
+<script>
+    function toggleDetails(id) {
+        const p = document.getElementById(id);
+        const card = p.closest('.rank-card');
+        if (p.style.display === "block") {
+            p.style.display = "none";
+            card.style.background = "var(--surface)";
+        } else {
+            // Close others? Optional.
+            p.style.display = "block";
+            card.style.background = "rgba(255,255,255,0.08)";
+        }
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+
+{% block title %}Upload - Bytewise Matcher{% endblock %}
+
+{% block content %}
+<style>
+    .upload-card {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 40px;
+        text-align: center;
+    }
+
+    .hero-text {
+        margin-bottom: 40px;
+    }
+
+    .hero-text h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        background: linear-gradient(to right, #fff, #94a3b8);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .hero-text p {
+        color: var(--text-muted);
+        font-size: 1.1rem;
+    }
+
+    .drop-zone {
+        border: 2px dashed var(--glass-border);
+        border-radius: 16px;
+        padding: 40px;
+        transition: all 0.3s ease;
+        background: rgba(255, 255, 255, 0.02);
+        cursor: pointer;
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+    .drop-zone:hover,
+    .drop-zone.dragover {
+        border-color: var(--primary);
+        background: rgba(99, 102, 241, 0.1);
+    }
+
+    .drop-zone input {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .icon-upload {
+        font-size: 3rem;
+        margin-bottom: 15px;
+        color: var(--secondary);
+    }
+
+    .file-name {
+        margin-top: 10px;
+        font-size: 0.9rem;
+        color: var(--primary);
+        font-weight: 600;
+        display: none;
+    }
+
+    .or-divider {
+        margin: 20px 0;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .submit-btn {
+        width: 100%;
+        font-size: 1.1rem;
+        margin-top: 10px;
+    }
+
+    /* Loader */
+    .loader {
+        display: none;
+        border: 4px solid rgba(255, 255, 255, 0.1);
+        border-left-color: var(--primary);
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        animation: spin 1s linear infinite;
+        margin: 20px auto;
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+</style>
+
+<div class="glass-panel upload-card">
+    <div class="hero-text">
+        <h1>AI-Powered Matching</h1>
+        <p>Upload a resume and job description to accept precision insights.</p>
+    </div>
+
+    <form action="/" method="post" enctype="multipart/form-data" id="uploadForm">
+        <div class="drop-zone" id="resumeZone">
+            <input type="file" name="resume" id="resume" required multiple
+                onchange="updateFileName(this, 'resumeName')">
+            <div class="icon-upload">📄</div>
+            <h3>Upload Resume(s)</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Drag & drop multiple PDF or DOCX files</p>
+            <div class="file-name" id="resumeName"></div>
+        </div>
+
+        <div class="drop-zone" id="jdZone">
+            <input type="file" name="jd" id="jd" required onchange="updateFileName(this, 'jdName')">
+            <div class="icon-upload">💼</div>
+            <h3>Upload Job Description</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Drag & drop TXT file</p>
+            <div class="file-name" id="jdName"></div>
+        </div>
+
+        <button type="submit" class="btn submit-btn" onclick="showLoader()">Analyze Match</button>
+        <div class="loader" id="loader"></div>
+    </form>
+</div>
+
+<script>
+    function updateFileName(input, elementId) {
+        const files = input.files;
+        const el = document.getElementById(elementId);
+        if (files.length > 0) {
+            if (files.length === 1) {
+                el.textContent = "Selected: " + files[0].name;
+            } else {
+                el.textContent = "Selected: " + files.length + " files";
+            }
+            el.style.display = "block";
+            input.parentElement.style.borderColor = "#10b981"; // Green border
+        } else {
+            el.style.display = "none";
+        }
+    }
+
+    function showLoader() {
+        const form = document.getElementById('uploadForm');
+        if (form.checkValidity()) {
+            document.getElementById('loader').style.display = 'block';
+            document.querySelector('.submit-btn').style.opacity = '0.7';
+            document.querySelector('.submit-btn').innerText = 'Processing...';
+        }
+    }
+
+    // Drag and Drop Visuals
+    document.querySelectorAll('.drop-zone').forEach(zone => {
+        zone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            zone.classList.add('dragover');
+        });
+        zone.addEventListener('dragleave', () => {
+            zone.classList.remove('dragover');
+        });
+        zone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            zone.classList.remove('dragover');
+            const input = zone.querySelector('input');
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            input.files = files;
+            // Trigger change event manually
+            const event = new Event('change');
+            input.dispatchEvent(event);
+        });
+    });
+</script>
+{% endblock %}
