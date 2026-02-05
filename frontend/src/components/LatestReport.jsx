@@ -44,7 +44,7 @@ export default function LatestReport() {
     );
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-bg-deep text-slate-900 dark:text-white animate-fade-in">
+        <div className="bg-slate-50 dark:bg-bg-deep text-slate-900 dark:text-white animate-fade-in">
             <div className="w-full">
                 <ResultsDashboard jobId={jobId} onReset={() => navigate('/')} />
             </div>

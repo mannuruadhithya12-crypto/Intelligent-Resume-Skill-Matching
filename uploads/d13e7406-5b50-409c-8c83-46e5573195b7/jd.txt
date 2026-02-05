@@ -1,0 +1,4 @@
+We are looking for a Data Scientist with experience in Python,
+Machine Learning, SQL, NLP, and data analysis.
+Minimum 3 years of experience is required.
+Experience with AWS and Docker is a plus.

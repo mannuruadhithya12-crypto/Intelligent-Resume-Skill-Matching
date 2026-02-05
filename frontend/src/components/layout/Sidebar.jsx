@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { FiLogOut, FiPieChart, FiHome, FiUsers, FiSettings, FiClock } from 'react-icons/fi';
+import { FiLogOut, FiPieChart, FiHome, FiUsers, FiSettings, FiClock, FiCpu } from 'react-icons/fi';
 import { NavLink } from 'react-router-dom';
 
 export default function Sidebar() {
@@ -20,45 +20,66 @@ export default function Sidebar() {
     ];
 
     return (
-        <aside className="w-64 flex flex-col border-r border-slate-200 dark:border-border-subtle bg-white dark:bg-bg-card min-h-screen transition-colors">
-            <div className="p-6 flex items-center gap-3">
-                <div className="size-10 bg-primary rounded-lg flex items-center justify-center text-white w-10 h-10 shadow-lg shadow-indigo-500/20">
-                    <span className="material-symbols-outlined font-bold text-xl">AI</span>
+        <aside className="w-72 flex flex-col border-r border-white/5 bg-bg-deep/50 backdrop-blur-xl min-h-screen relative z-50">
+            {/* Logo Area */}
+            <div className="p-8 flex items-center gap-4">
+                <div className="relative size-12 flex items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-secondary shadow-neon">
+                    <FiCpu className="text-white text-xl animate-pulse-slow" />
+                    <div className="absolute inset-0 bg-white/20 blur-lg rounded-2xl"></div>
                 </div>
                 <div>
-                    <h1 className="font-bold text-slate-900 dark:text-white text-lg tracking-tight">RecruitAI</h1>
-                    <p className="text-[10px] text-gray-500 font-medium uppercase tracking-wider">{user?.role ? user.role.replace('_', ' ').toUpperCase() : 'PLAN'}</p>
+                    <h1 className="font-display font-bold text-white text-xl tracking-tight leading-none">RecruitAI</h1>
+                    <p className="text-[10px] text-primary-glow font-bold uppercase tracking-[0.2em] mt-1">Enterprise</p>
                 </div>
             </div>
 
-            <nav className="flex-1 px-4 space-y-1 mt-2">
+            <nav className="flex-1 px-6 space-y-2 mt-4">
+                <p className="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">Main Menu</p>
                 {navItems.map((item) => (
                     <NavLink
                         key={item.name}
                         to={item.path}
                         className={({ isActive }) => `
-                            w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200
+                            relative group w-full flex items-center gap-4 px-4 py-3.5 rounded-xl text-sm font-medium transition-all duration-300
                             ${isActive
-                                ? 'bg-indigo-50 dark:bg-primary text-indigo-600 dark:text-white shadow-sm dark:shadow-indigo-500/20'
-                                : 'text-slate-500 dark:text-gray-400 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white'}
+                                ? 'text-white bg-white/5 shadow-lg shadow-primary/10 border border-primary/20'
+                                : 'text-slate-400 hover:text-white hover:bg-white/5'}
                         `}
                     >
-                        {item.icon}
-                        {item.name}
+                        {({ isActive }) => (
+                            <>
+                                <span className={`transition-colors duration-300 ${isActive ? 'text-primary-glow' : 'text-slate-500 group-hover:text-primary-glow'}`}>
+                                    {item.icon}
+                                </span>
+                                {item.name}
+                                {isActive && (
+                                    <div className="absolute right-3 w-1.5 h-1.5 rounded-full bg-primary shadow-neon"></div>
+                                )}
+                            </>
+                        )}
                     </NavLink>
                 ))}
             </nav>
 
             {/* Footer Area with Logout */}
-            <div className="p-4 mt-auto space-y-4">
-                <button
-                    onClick={logout}
-                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-red-400 hover:bg-red-500/10 transition-colors"
-                >
-                    <FiLogOut /> Logout
-                </button>
-
+            <div className="p-6 mt-auto space-y-6">
                 <UsageStats />
+
+                <div className="border-t border-white/5 pt-4">
+                    <div className="flex items-center gap-3 px-2 mb-4">
+                        <div className="size-8 rounded-full bg-gradient-to-tr from-primary to-purple-500 p-[1px]">
+                            <div className="size-full rounded-full bg-bg-deep flex items-center justify-center text-xs font-bold text-white">
+                                {user?.email?.charAt(0).toUpperCase() || 'U'}
+                            </div>
+                        </div>
+                        <div className="overflow-hidden">
+                            <p className="text-sm font-bold text-white truncate">{user?.full_name || 'User'}</p>
+                            <button onClick={logout} className="text-xs text-red-400 hover:text-red-300 flex items-center gap-1 transition-colors">
+                                <FiLogOut size={10} /> Sign Out
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </aside>
     );
@@ -77,13 +98,21 @@ function UsageStats() {
     const percent = Math.min((usage / limit) * 100, 100);
 
     return (
-        <div className="bg-bg-deep border border-border-subtle rounded-xl p-4">
-            <div className="flex justify-between items-center mb-2">
-                <h4 className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Usage</h4>
-                <span className="text-[10px] text-gray-400">{usage} / {limit}</span>
+        <div className="glass-panel p-4 rounded-2xl relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-3 opacity-20 text-primary transform translate-x-1/3 -translate-y-1/3 group-hover:rotate-12 transition-transform duration-700">
+                <FiCpu size={50} />
             </div>
-            <div className="w-full h-1.5 bg-border-subtle rounded-full overflow-hidden">
-                <div className="h-full bg-primary rounded-full transition-all duration-1000" style={{ width: `${percent}%` }}></div>
+
+            <div className="flex justify-between items-center mb-3 relative z-10">
+                <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Calculations</h4>
+                <span className="text-[10px] font-mono text-primary-glow">{usage}/{limit}</span>
+            </div>
+
+            <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden relative z-10">
+                <div
+                    className="h-full bg-gradient-to-r from-primary to-secondary rounded-full shadow-neon transition-all duration-1000"
+                    style={{ width: `${percent}%` }}
+                ></div>
             </div>
         </div>
     );

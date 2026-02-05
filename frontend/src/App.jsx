@@ -77,11 +77,6 @@ export default function App() {
                 <CandidateAnalysis />
               </ProtectedRoute>
             } />
-            <Route path="/report" element={
-              <ProtectedRoute>
-                <LatestReport />
-              </ProtectedRoute>
-            } />
 
             <Route path="/" element={
               <ProtectedRoute>
@@ -92,6 +87,7 @@ export default function App() {
               <Route path="analytics" element={<AnalyticsDashboard />} />
               <Route path="history" element={<HistoryPage />} />
               <Route path="candidates" element={<CandidatesList />} />
+              <Route path="report" element={<LatestReport />} />
               <Route path="settings" element={<SettingsPage />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Route>

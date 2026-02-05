@@ -253,7 +253,7 @@ export default function ResultsDashboard({ jobId, onReset, onSwitchJob }) {
     }
 
     return (
-        <div className="bg-slate-50 dark:bg-bg-deep min-h-screen font-sans text-slate-900 dark:text-white flex flex-col animate-fade-in pb-20 relative transition-colors" onClick={() => { setShowNotifications(false); setShowMessages(false); setShowProfileMenu(false); }}>
+        <div className="bg-slate-50 dark:bg-bg-deep font-sans text-slate-900 dark:text-white flex flex-col animate-fade-in pb-20 relative transition-colors" onClick={() => { setShowNotifications(false); setShowMessages(false); setShowProfileMenu(false); }}>
 
             {/* HEADER */}
             <header className="h-16 bg-white dark:bg-bg-card border-b border-slate-200 dark:border-border-subtle flex items-center justify-between px-8 sticky top-0 z-10 w-full shadow-sm transition-colors">

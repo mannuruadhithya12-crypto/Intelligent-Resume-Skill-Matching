@@ -337,7 +337,15 @@ async def get_results(
                 phone=r.get('phone'),
                 summary=r.get('summary'),
                 interview_questions=r.get('interview_questions', []),
-                status=r.get('status', 'new')
+                status=r.get('status', 'new'),
+                linkedin_url=r.get('linkedin_url'),
+                github_url=r.get('github_url'),
+                portfolio_url=r.get('portfolio_url'),
+                location=r.get('location'),
+                education_history=r.get('education_history', []),
+                experience_history=r.get('experience_history', []),
+                projects=r.get('projects', []),
+                certifications=r.get('certifications', [])
             ) for r in job['results']
         ]
         
@@ -375,7 +383,15 @@ async def get_results(
                     phone=r.get('phone'),
                     summary=r.get('summary'),
                     interview_questions=r.get('interview_questions', []),
-                    status=r.get('status', 'new')
+                    status=r.get('status', 'new'),
+                    linkedin_url=r.get('linkedin_url'),
+                    github_url=r.get('github_url'),
+                    portfolio_url=r.get('portfolio_url'),
+                    location=r.get('location'),
+                    education_history=r.get('education_history', []),
+                    experience_history=r.get('experience_history', []),
+                    projects=r.get('projects', []),
+                    certifications=r.get('certifications', [])
                 ) for r in db_results
             ]
              

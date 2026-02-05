@@ -29,7 +29,15 @@ class CandidateScore(BaseModel):
     rank: Optional[int] = None
     email: Optional[str] = None
     phone: Optional[str] = None
+    linkedin_url: Optional[str] = None
+    github_url: Optional[str] = None
+    portfolio_url: Optional[str] = None
+    location: Optional[str] = None
     summary: Optional[str] = None
+    education_history: Optional[List[Dict[str, Any]]] = None
+    experience_history: Optional[List[Dict[str, Any]]] = None
+    projects: Optional[List[Dict[str, Any]]] = None
+    certifications: Optional[List[str]] = None
     interview_questions: Optional[List[str]] = None
     status: Optional[str] = "new" 
     categorized_skills: Optional[Dict[str, List[str]]] = None

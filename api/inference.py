@@ -22,7 +22,9 @@ from src.matching.bias_filter import remove_bias
 from src.matching.role_weights import get_role_weights, apply_role_weights
 from src.explainability.score_breakdown import calculate_final_score
 from src.recommendation.skill_gap_recommender import recommend_skills
+from src.recommendation.skill_gap_recommender import recommend_skills
 from src.recommendation.learning_path import suggest_learning_paths
+from src.feature_extraction.comprehensive_parser import parser as comprehensive_parser
 
 class MLInferenceEngine:
     """
@@ -138,8 +140,9 @@ class MLInferenceEngine:
         sorted_roles = sorted(role_matches.items(), key=lambda x: x[1], reverse=True)
         
         # Return top 3 roles with >30% match
-        recommended = [(role, score) for role, score in sorted_roles[:3] if score > 30]
-        return recommended if recommended else [("General Software Engineer", 50)]
+        # Format: Just returning the role name as a string to simplify frontend handling
+        recommended = [role for role, score in sorted_roles[:3] if score > 30]
+        return recommended if recommended else ["General Software Engineer"]
     
     def analyze_resume(self, resume_path: str, jd_text: str, job_role: str = "Data Scientist"):
         """
@@ -245,6 +248,22 @@ class MLInferenceEngine:
             'categorized_skills': categorized_skills,
             'role_weights_applied': role_weights
         }
+        
+        # Merge comprehensive data
+        structured_data = comprehensive_parser.parse(resume_text_raw)
+        result.update({
+            'email': structured_data['contact_info'].get('email'),
+            'phone': structured_data['contact_info'].get('phone'),
+            'linkedin_url': structured_data['contact_info'].get('linkedin'),
+            'github_url': structured_data['contact_info'].get('github'),
+            'location': structured_data['contact_info'].get('location'),
+            'education_history': structured_data.get('education', []),
+            'experience_history': structured_data.get('experience', []),
+            'projects': structured_data.get('projects', []),
+            'certifications': structured_data.get('certifications', [])
+        })
+        
+        return result
     
     def batch_analyze(self, resume_paths: list, jd_text: str, job_role: str = "Data Scientist"):
         """

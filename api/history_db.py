@@ -72,6 +72,24 @@ def init_history_db():
     except sqlite3.OperationalError:
         pass 
     
+    # Migration: Add new detailed fields if missing
+    new_columns = [
+        ("linkedin_url", "TEXT"),
+        ("github_url", "TEXT"), 
+        ("portfolio_url", "TEXT"),
+        ("location", "TEXT"),
+        ("education_history", "TEXT"), # JSON
+        ("experience_history", "TEXT"), # JSON
+        ("projects", "TEXT"), # JSON
+        ("certifications", "TEXT") # JSON
+    ]
+    
+    for col_name, col_type in new_columns:
+        try:
+            c.execute(f"ALTER TABLE candidate_results ADD COLUMN {col_name} {col_type}")
+        except sqlite3.OperationalError:
+            pass
+            
     # Analytics aggregation table
     c.execute('''
         CREATE TABLE IF NOT EXISTS analytics_summary (
@@ -166,11 +184,19 @@ def save_candidate_results(job_id: str, results: List[Dict]):
         recommended_roles = json.dumps(r.get('recommended_roles', []))
         interview_questions = json.dumps(r.get('interview_questions', []))
         
+        # New fields serialization
+        edu_history = json.dumps(r.get('education_history', []))
+        exp_history = json.dumps(r.get('experience_history', []))
+        projects = json.dumps(r.get('projects', []))
+        certs = json.dumps(r.get('certifications', []))
+        
         conn.execute('''
             INSERT INTO candidate_results 
             (job_id, filename, final_score, semantic_score, experience_score, education_score, rank,
-             email, phone, matched_skills, missing_skills, recommended_roles, match_classification, summary, interview_questions)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+             email, phone, matched_skills, missing_skills, recommended_roles, match_classification, 
+             summary, interview_questions, linkedin_url, github_url, portfolio_url, location,
+             education_history, experience_history, projects, certifications)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
             job_id, 
             r['filename'], 
@@ -186,7 +212,15 @@ def save_candidate_results(job_id: str, results: List[Dict]):
             recommended_roles,
             r.get('match_classification'),
             r.get('summary'),
-            interview_questions
+            interview_questions,
+            r.get('linkedin_url'),
+            r.get('github_url'),
+            r.get('portfolio_url'),
+            r.get('location'),
+            edu_history,
+            exp_history,
+            projects,
+            certs
         ))
     conn.commit()
     conn.close()
@@ -242,12 +276,23 @@ def get_job_results(job_id: str) -> List[Dict]:
             r['missing_skills'] = json.loads(r['missing_skills']) if r.get('missing_skills') else []
             r['recommended_roles'] = json.loads(r['recommended_roles']) if r.get('recommended_roles') else []
             r['interview_questions'] = json.loads(r['interview_questions']) if r.get('interview_questions') else []
+            
+            # Parse new fields
+            r['education_history'] = json.loads(r['education_history']) if r.get('education_history') else []
+            r['experience_history'] = json.loads(r['experience_history']) if r.get('experience_history') else []
+            r['projects'] = json.loads(r['projects']) if r.get('projects') else []
+            r['certifications'] = json.loads(r['certifications']) if r.get('certifications') else []
+            
         except:
             # Fallback if parsing fails
             r['matched_skills'] = []
             r['missing_skills'] = []
             r['recommended_roles'] = []
             r['interview_questions'] = []
+            r['education_history'] = []
+            r['experience_history'] = []
+            r['projects'] = []
+            r['certifications'] = []
             
         results.append(r)
         
