@@ -1,0 +1,11 @@
+node_modules
+frontend/node_modules
+__pycache__
+*.pyc
+.git
+.env
+venv
+users.db
+analysis_history.db
+uploads
+.pytest_cache

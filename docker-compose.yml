@@ -1,24 +1,25 @@
 version: '3.8'
 
 services:
-  web:
+  backend:
     build: .
-    container_name: resume_matcher_app
-    restart: always
-    environment:
-      - FLASK_ENV=production
-    volumes:
-      - ./data:/app/data  # Persist data if needed, or maps host data
-    expose:
-      - "8000"
-
-  nginx:
-    image: nginx:alpine
-    container_name: resume_matcher_nginx
+    container_name: resume_matcher_backend
     restart: always
     ports:
-      - "80:80"
+      - "8000:8000"
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./uploads:/app/uploads
+      - ./users.db:/app/users.db
+      - ./analysis_history.db:/app/analysis_history.db
+    environment:
+      - DATABASE_URL=sqlite:///users.db
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: resume_matcher_frontend
+    restart: always
+    ports:
+      - "3000:80"
     depends_on:
-      - web
+      - backend
