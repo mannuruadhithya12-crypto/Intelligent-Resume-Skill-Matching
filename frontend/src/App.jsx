@@ -33,9 +33,9 @@ const ProtectedRoute = ({ children }) => {
 // Main App Layout
 const Layout = () => {
   return (
-    <div className="bg-slate-50 dark:bg-bg-deep text-slate-900 dark:text-gray-200 font-display min-h-screen flex h-screen overflow-hidden">
+    <div className="bg-[#050B14] text-slate-200 font-display min-h-screen flex h-screen overflow-hidden">
       <Sidebar />
-      <main className="flex-1 flex flex-col overflow-y-auto bg-slate-50 dark:bg-bg-deep relative">
+      <main className="flex-1 flex flex-col overflow-y-auto bg-[#050B14] relative">
         <TopNavbar />
         <div className="p-8 max-w-7xl mx-auto w-full flex-1">
           <Outlet />
@@ -72,23 +72,15 @@ export default function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<RecruiterSignup />} />
 
-            <Route path="/analysis/:jobId/:filename" element={
-              <ProtectedRoute>
-                <CandidateAnalysis />
-              </ProtectedRoute>
-            } />
-
-            <Route path="/" element={
-              <ProtectedRoute>
-                <Layout />
-              </ProtectedRoute>
-            }>
-              <Route index element={<DashboardHome />} />
-              <Route path="analytics" element={<AnalyticsDashboard />} />
-              <Route path="history" element={<HistoryPage />} />
-              <Route path="candidates" element={<CandidatesList />} />
-              <Route path="report" element={<LatestReport />} />
-              <Route path="settings" element={<SettingsPage />} />
+            {/* Protected Routes encapsulated in Layout */}
+            <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+              <Route path="/" element={<DashboardHome />} />
+              <Route path="/analytics" element={<AnalyticsDashboard />} />
+              <Route path="/history" element={<HistoryPage />} />
+              <Route path="/candidates" element={<CandidatesList />} />
+              <Route path="/report" element={<LatestReport />} />
+              <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/analysis/:jobId/:filename" element={<CandidateAnalysis />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Route>
           </Routes>

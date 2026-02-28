@@ -7,35 +7,35 @@ export default {
   theme: {
     extend: {
       colors: {
-        'bg-deep': '#050B14', // Deeper, richer black/blue
-        'bg-card': 'rgba(15, 23, 42, 0.6)', // Glassmorphism base
-        'bg-card-hover': 'rgba(30, 41, 59, 0.7)',
-        'border-subtle': 'rgba(255, 255, 255, 0.08)',
-        'border-highlight': 'rgba(99, 102, 241, 0.5)', // Indigo highlight
+        'bg-deep': '#050B14', // Base app background
+        'bg-card': '#0f172a', // Required card background
+        'bg-card-hover': '#1e293b',
+        'border-subtle': '#1f2937', // border-gray-800 equivalent
+        'border-highlight': 'rgba(99, 102, 241, 0.5)',
 
-        'primary': '#6366F1', // Indigo-500
-        'primary-glow': '#818cf8', // Indigo-400
-        'secondary': '#EC4899', // Pink-500 for accents
+        'primary': '#2563eb', // blue-600
+        'primary-glow': '#3b82f6', // blue-500
+        'secondary': '#9333ea', // purple-600
 
-        'text-main': '#F8FAFC',
-        'text-muted': '#94A3B8',
+        'text-main': '#f8fafc',
+        'text-muted': '#9ca3af', // gray-400
 
-        'success': '#10B981', // Emerald-500
-        'warning': '#F59E0B', // Amber-500
-        'error': '#EF4444', // Red-500
+        'success': '#10b981',
+        'warning': '#f59e0b',
+        'error': '#ef4444',
       },
       fontFamily: {
-        display: ['Outfit', 'Inter', 'sans-serif'], // Premium font stack
+        display: ['Outfit', 'Inter', 'sans-serif'],
         sans: ['Inter', 'sans-serif'],
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'checkered': "linear-gradient(#1e293b 1px, transparent 1px), linear-gradient(90deg, #1e293b 1px, transparent 1px)",
-        'mesh-gradient': 'radial-gradient(at 0% 0%, rgba(99,102,241,0.15) 0px, transparent 50%), radial-gradient(at 100% 0%, rgba(236,72,153,0.15) 0px, transparent 50%), radial-gradient(at 100% 100%, rgba(16,185,129,0.15) 0px, transparent 50%)',
+        'mesh-gradient': 'radial-gradient(at 0% 0%, rgba(37,99,235,0.15) 0px, transparent 50%), radial-gradient(at 100% 0%, rgba(147,51,234,0.15) 0px, transparent 50%)',
       },
       boxShadow: {
-        'neon': '0 0 20px rgba(99, 102, 241, 0.5)',
+        'neon': '0 0 20px rgba(37, 99, 235, 0.5)',
         'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
+        'card': '0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.2)', // shadow-xl equivalent for dark mode
       },
       keyframes: {
         float: {
@@ -49,17 +49,24 @@ export default {
         fadeInUp: {
           '0%': { opacity: '0', transform: 'translateY(10px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        pulseGlow: {
+          '0%, 100%': { opacity: '1', transform: 'scale(1)' },
+          '50%': { opacity: '0.8', transform: 'scale(1.05)', boxShadow: '0 0 25px rgba(37, 99, 235, 0.6)' },
+        },
+        skeletonProgress: {
+          '0%': { backgroundPosition: '200% 0' },
+          '100%': { backgroundPosition: '-200% 0' },
         }
       },
       animation: {
         'float': 'float 6s ease-in-out infinite',
         'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        'fade-in': 'fadeIn 0.5s ease-out forwards',
-        'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
+        'fade-in': 'fadeIn 0.3s ease-out forwards',
+        'fade-in-up': 'fadeInUp 0.4s ease-out forwards',
+        'pulse-glow': 'pulseGlow 2s infinite',
+        'skeleton': 'skeletonProgress 1.5s infinite linear',
       },
-      backdropBlur: {
-        'xs': '2px',
-      }
     },
   },
   plugins: [],

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:8000';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 const API_URL = `${BASE_URL}/api`;
 
 export const api = axios.create({
@@ -10,6 +10,28 @@ export const api = axios.create({
     },
 });
 
+// Add interceptor to attach token
+api.interceptors.request.use((config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+});
+
+// Intercept 401 Unauthorized responses to force logout
+api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response && error.response.status === 401) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/login';
+        }
+        return Promise.reject(error);
+    }
+);
+
 // Create a separate instance or helper for Auth which is at standard root or specific path
 export const authApi = axios.create({
     baseURL: BASE_URL,
@@ -18,6 +40,26 @@ export const authApi = axios.create({
     }
 });
 
+authApi.interceptors.request.use((config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+});
+
+// Setup 401 response handling for auth instance as well
+authApi.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response && error.response.status === 401) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/login';
+        }
+        return Promise.reject(error);
+    }
+);
 
 export const uploadFiles = async (resumes, jdFile) => {
     const formData = new FormData();
@@ -30,13 +72,19 @@ export const uploadFiles = async (resumes, jdFile) => {
     // Append JD
     formData.append('job_description', jdFile);
 
-    const response = await api.post('/upload', formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data',
-        },
-    });
-
-    return response.data;
+    try {
+        const response = await api.post('/upload', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+        return response.data;
+    } catch (err) {
+        if (err.response && err.response.data) {
+            console.error("Upload Validation Error:", JSON.stringify(err.response.data, null, 2));
+        }
+        throw err;
+    }
 };
 
 export const startAnalysis = async (jobId) => {

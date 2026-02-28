@@ -52,20 +52,20 @@ class MLInferenceEngine:
             ensemble_path = "models/ensemble_classifier.pkl"
             if os.path.exists(ensemble_path):
                 self._model = joblib.load(ensemble_path)
-                print(f"✓ Loaded ensemble model from {ensemble_path}")
+                print(f"[OK] Loaded ensemble model from {ensemble_path}")
             else:
                 # Fallback to standard model
                 standard_path = "models/match_classifier.pkl"
                 if os.path.exists(standard_path):
                     self._model = joblib.load(standard_path)
-                    print(f"✓ Loaded standard model from {standard_path}")
+                    print(f"[OK] Loaded standard model from {standard_path}")
                 else:
-                    print("⚠ Warning: No trained model found. Using rule-based scoring only.")
+                    print("[WARNING] No trained model found. Using rule-based scoring only.")
                     self._model = None
             
             self._model_loaded = True
         except Exception as e:
-            print(f"❌ Error loading model: {e}")
+            print(f"[ERROR] Error loading model: {e}")
             self._model = None
             self._model_loaded = False
     

@@ -51,15 +51,12 @@ app.include_router(auth_router)
 app.include_router(interview_router)
 
 # CORS middleware for React frontend
+import os
+allowed_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:5173,http://localhost:5174,http://localhost:5175,http://localhost:5176").split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000", 
-        "http://localhost:5173", 
-        "http://localhost:5174", 
-        "http://localhost:5175", 
-        "http://localhost:5176"
-    ],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -491,11 +488,9 @@ class AnalyticsResponse(BaseModel):
     top_skills_demand: List[str]
     model_health: Dict[str, Any]
 
-from api.rbac import require_hr_manager_or_above
-
 @app.get("/api/analytics", response_model=AnalyticsResponse)
 async def get_analytics(
-    current_user: User = Depends(require_hr_manager_or_above),
+    current_user: User = Depends(require_recruiter_or_above),
     days: int = 7
 ):
     """Get recruitment analytics dashboard data"""
@@ -519,7 +514,7 @@ async def get_analytics(
 
 @app.get("/api/analytics/detailed")
 async def get_detailed_analytics(
-    current_user: User = Depends(require_hr_manager_or_above),
+    current_user: User = Depends(require_recruiter_or_above),
     days: int = 7
 ):
     """Get detailed analytics with charts data"""

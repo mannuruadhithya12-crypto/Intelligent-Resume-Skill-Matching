@@ -9,20 +9,6 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    useEffect(() => {
-        if (token) {
-            api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-            if (!user) {
-                // Fetch user info if we have a token but no user data
-                fetchUserInfo();
-            }
-        } else {
-            delete api.defaults.headers.common['Authorization'];
-            setUser(null);
-            localStorage.removeItem('user');
-        }
-    }, [token]);
-
     const fetchUserInfo = async () => {
         try {
             const response = await authApi.get('/auth/me', {
@@ -35,10 +21,29 @@ export const AuthProvider = ({ children }) => {
             localStorage.setItem('user', JSON.stringify(mergedUser));
         } catch (err) {
             console.error("Failed to fetch user info", err);
-            // If token is invalid, logout
-            logout();
+            // If token is invalid, logout (handled elsewhere to avoid circular dependencies)
+            setToken(null);
+            setUser(null);
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            delete api.defaults.headers.common['Authorization'];
         }
     };
+
+    useEffect(() => {
+        if (token) {
+            api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            if (!user) {
+                // Fetch user info if we have a token but no user data
+                fetchUserInfo();
+            }
+        } else {
+            delete api.defaults.headers.common['Authorization'];
+            setUser(null);
+            localStorage.removeItem('user');
+        }
+    }, [token, user]); // Removed fetchUserInfo from deps to avoid infinite loop since it's not memoized
+
 
     const login = async (email, password) => {
         setLoading(true);

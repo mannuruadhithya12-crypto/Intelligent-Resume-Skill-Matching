@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  backend:
+    build: .
+    container_name: recruitai_backend_prod
+    restart: always
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./uploads:/app/uploads
+      - ./data:/app/data
+      - ./users.db:/app/users.db
+      - ./analysis_history.db:/app/analysis_history.db
+    environment:
+      - DATABASE_URL=sqlite:///users.db
+      - ALLOWED_ORIGINS=http://yourdomain.com,https://yourdomain.com
+      - PORT=8000
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: recruitai_frontend_prod
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    environment:
+      - VITE_API_BASE_URL=https://api.yourdomain.com
+      - VITE_GOOGLE_CLIENT_ID=your-google-client-id

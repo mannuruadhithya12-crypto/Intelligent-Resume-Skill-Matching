@@ -8,7 +8,7 @@ export const useTheme = () => useContext(ThemeContext);
 
 export const ThemeProvider = ({ children }) => {
     const { user } = useAuth();
-    const [theme, setTheme] = useState('light');
+    const [theme, setTheme] = useState('dark');
     const [loaded, setLoaded] = useState(false);
 
     // Initial Load when User is available
@@ -18,12 +18,12 @@ export const ThemeProvider = ({ children }) => {
                 if (settings.theme) {
                     setTheme(settings.theme);
                 }
-                setLoaded(true);
             }).catch(err => {
-                // Ignore errors (e.g. offline/auth) and keep default
-                console.log("Using default theme");
+            }).finally(() => {
                 setLoaded(true);
             });
+        } else {
+            setLoaded(true);
         }
     }, [user]);
 
