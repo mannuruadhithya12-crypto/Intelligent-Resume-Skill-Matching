@@ -46,6 +46,38 @@ const Layout = () => {
   );
 };
 
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null, errorInfo: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    this.setState({ error, errorInfo });
+    console.error("ErrorBoundary caught an error", error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ padding: 20, color: 'red', background: '#222', minHeight: '100vh', zIndex: 9999, position: 'relative' }}>
+          <h2>Something went wrong.</h2>
+          <details style={{ whiteSpace: 'pre-wrap' }}>
+            {this.state.error && this.state.error.toString()}
+            <br />
+            {this.state.errorInfo && this.state.errorInfo.componentStack}
+          </details>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 // Dashboard Home (Analysis Flow)
 const DashboardHome = () => {
   const [jobId, setJobId] = React.useState(null);
@@ -54,10 +86,14 @@ const DashboardHome = () => {
 
   // If we wanted to link to results via URL, we would use navigate('/results/:id')
   // But for now, keeping state-based flow for the Home view as requested originally
-  return !jobId ? (
-    <ResumeAnalysisPage onAnalysisStart={handleAnalysisStart} />
-  ) : (
-    <ResultsDashboard jobId={jobId} onReset={handleReset} onSwitchJob={handleAnalysisStart} />
+  return (
+    <ErrorBoundary>
+      {!jobId ? (
+        <ResumeAnalysisPage onAnalysisStart={handleAnalysisStart} />
+      ) : (
+        <ResultsDashboard jobId={jobId} onReset={handleReset} onSwitchJob={handleAnalysisStart} />
+      )}
+    </ErrorBoundary>
   );
 };
 

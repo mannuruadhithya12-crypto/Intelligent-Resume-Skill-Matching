@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
-import { FiUser, FiBriefcase, FiMail, FiLock, FiEye, FiEyeOff, FiArrowRight, FiCpu, FiLock as FiSecureLock } from 'react-icons/fi';
+import { FiUser, FiBriefcase, FiMail, FiLock, FiEye, FiEyeOff, FiArrowRight } from 'react-icons/fi';
 
 const RecruiterSignup = () => {
     const { register, loading, error, token } = useAuth();
@@ -27,189 +27,144 @@ const RecruiterSignup = () => {
     };
 
     return (
-        <div className="bg-[#050B14] font-display min-h-screen flex flex-col relative overflow-hidden">
-            {/* Grid Background Pattern */}
-            <div className="absolute inset-0 z-0 opacity-20 pointer-events-none"
-                style={{
-                    backgroundImage: 'linear-gradient(#1E293B 1px, transparent 1px), linear-gradient(90deg, #1E293B 1px, transparent 1px)',
-                    backgroundSize: '50px 50px'
-                }}>
+        <div className="bg-background-light dark:bg-background-dark font-display text-[#111418] dark:text-white min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+            <div className="sm:mx-auto sm:w-full sm:max-w-md">
+                <div className="flex justify-center text-primary">
+                    <svg fill="none" viewBox="0 0 48 48" className="w-12 h-12" xmlns="http://www.w3.org/2000/svg">
+                        <path clipRule="evenodd" d="M12.0799 24L4 19.2479L9.95537 8.75216L18.04 13.4961L18.0446 4H29.9554L29.96 13.4961L38.0446 8.75216L44 19.2479L35.92 24L44 28.7521L38.0446 39.2479L29.96 34.5039L29.9554 44H18.0446L18.04 34.5039L9.95537 39.2479L4 28.7521L12.0799 24Z" fill="currentColor" fillRule="evenodd"></path>
+                    </svg>
+                </div>
+                <h2 className="mt-6 text-center text-3xl font-extrabold text-[#111418] dark:text-white">
+                    Create Account
+                </h2>
+                <p className="mt-2 text-center text-sm text-[#617589] dark:text-gray-400">
+                    Join the enterprise AI candidate analysis platform
+                </p>
             </div>
 
-            {/* HEADER */}
-            <header className="w-full border-b border-white/5 backdrop-blur-sm sticky top-0 z-50">
-                <div className="max-w-[1400px] mx-auto px-8 py-5 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <div className="size-10 bg-primary/20 rounded-lg flex items-center justify-center text-primary border border-primary/20">
-                            <FiCpu size={22} />
+            <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+                <div className="bg-white dark:bg-[#111418] py-8 px-4 shadow sm:rounded-lg sm:px-10 border border-[#f0f2f4] dark:border-gray-800">
+                    
+                    {error && (
+                        <div className="mb-6 p-3 bg-red-100 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-700 dark:text-red-400 font-medium text-center">
+                            {error}
                         </div>
-                        <div className="flex flex-col">
-                            <h2 className="text-xl font-bold text-white tracking-tight">ResumeAI</h2>
-                            <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-slate-500">
-                                Recruiter Hub
+                    )}
+
+                    <form className="space-y-6" onSubmit={handleSubmit}>
+                        
+                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                            <div>
+                                <label className="block text-sm font-bold text-[#111418] dark:text-white mb-2">
+                                    Full Name
+                                </label>
+                                <div className="relative rounded-lg shadow-sm">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#617589]">
+                                        <FiUser />
+                                    </div>
+                                    <input
+                                        type="text"
+                                        required
+                                        value={fullName}
+                                        onChange={(e) => setFullName(e.target.value)}
+                                        placeholder="John Doe"
+                                        className="block w-full pl-10 pr-3 py-3 border border-[#f0f2f4] dark:border-gray-800 rounded-lg bg-[#f0f2f4] dark:bg-gray-800 text-[#111418] dark:text-white placeholder-[#617589] focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors sm:text-sm"
+                                    />
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label className="block text-sm font-bold text-[#111418] dark:text-white mb-2">
+                                    Company
+                                </label>
+                                <div className="relative rounded-lg shadow-sm">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#617589]">
+                                        <FiBriefcase />
+                                    </div>
+                                    <input
+                                        type="text"
+                                        required
+                                        value={company}
+                                        onChange={(e) => setCompany(e.target.value)}
+                                        placeholder="Acme Corp"
+                                        className="block w-full pl-10 pr-3 py-3 border border-[#f0f2f4] dark:border-gray-800 rounded-lg bg-[#f0f2f4] dark:bg-gray-800 text-[#111418] dark:text-white placeholder-[#617589] focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors sm:text-sm"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-bold text-[#111418] dark:text-white mb-2">
+                                Work Email
+                            </label>
+                            <div className="relative rounded-lg shadow-sm">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#617589]">
+                                    <FiMail />
+                                </div>
+                                <input
+                                    type="email"
+                                    required
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    placeholder="name@company.com"
+                                    className="block w-full pl-10 pr-3 py-3 border border-[#f0f2f4] dark:border-gray-800 rounded-lg bg-[#f0f2f4] dark:bg-gray-800 text-[#111418] dark:text-white placeholder-[#617589] focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors sm:text-sm"
+                                />
+                            </div>
+                        </div>
+
+                        <div>
+                            <div className="flex justify-between items-center mb-2">
+                                <label className="block text-sm font-bold text-[#111418] dark:text-white">
+                                    Password
+                                </label>
+                            </div>
+                            <div className="relative rounded-lg shadow-sm">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#617589]">
+                                    <FiLock />
+                                </div>
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    required
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    placeholder="••••••••"
+                                    className="block w-full pl-10 pr-10 py-3 border border-[#f0f2f4] dark:border-gray-800 rounded-lg bg-[#f0f2f4] dark:bg-gray-800 text-[#111418] dark:text-white placeholder-[#617589] focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors sm:text-sm"
+                                />
+                                <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="text-[#617589] hover:text-[#111418] dark:hover:text-white focus:outline-none transition-colors"
+                                    >
+                                        {showPassword ? <FiEyeOff /> : <FiEye />}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className={`w-full flex justify-center items-center gap-2 py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-bold text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all ${loading ? 'opacity-70 cursor-wait' : ''}`}
+                            >
+                                {loading ? 'Creating Account...' : 'Create Account'}
+                                <FiArrowRight size={18} />
+                            </button>
+                        </div>
+                    </form>
+
+                    <div className="mt-8 relative">
+                        <div className="absolute inset-0 flex items-center">
+                            <div className="w-full border-t border-[#f0f2f4] dark:border-gray-800"></div>
+                        </div>
+                        <div className="relative flex justify-center text-sm">
+                            <span className="px-2 bg-white dark:bg-[#111418] text-[#617589] dark:text-gray-400">
+                                Already have an account? <Link to="/login" className="text-primary font-bold hover:text-primary/80 transition-colors">Sign In</Link>
                             </span>
                         </div>
                     </div>
-
-                    <div className="flex items-center gap-2 px-3 py-1.5 bg-white/5 rounded-full border border-white/5">
-                        <div className="size-2 rounded-full bg-slate-500"></div>
-                        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                            Registration Mode
-                        </span>
-                    </div>
                 </div>
-            </header>
-
-            {/* MAIN */}
-            <main className="flex-grow flex items-center justify-center p-6 relative z-10">
-                <div className="w-full max-w-[480px]">
-                    <div className="bg-[#0F172A] border border-white/5 rounded-3xl overflow-hidden shadow-2xl relative">
-                        {/* Top Accent Line */}
-                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 opactiy-80"></div>
-
-                        <div className="p-10">
-                            <h1 className="text-3xl font-bold text-white mb-3 tracking-tight">
-                                Create Account
-                            </h1>
-                            <p className="text-slate-400 text-sm mb-8 leading-relaxed">
-                                Join the enterprise AI candidate analysis platform
-                            </p>
-
-                            {/* ERROR MESSAGE */}
-                            {error && (
-                                <div className="mb-6 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-xs text-red-400 font-medium text-center">
-                                    {error}
-                                </div>
-                            )}
-
-                            {/* FORM */}
-                            <form className="space-y-5" onSubmit={handleSubmit}>
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    {/* FULL NAME */}
-                                    <div className="space-y-2">
-                                        <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider pl-1">
-                                            Full Name
-                                        </label>
-                                        <div className="relative group">
-                                            <input
-                                                type="text"
-                                                required
-                                                value={fullName}
-                                                onChange={(e) => setFullName(e.target.value)}
-                                                placeholder="John Doe"
-                                                className="w-full h-12 pl-11 pr-4 rounded-xl border border-white/10 bg-[#0B1120] text-white text-sm focus:ring-2 focus:ring-primary/50 focus:border-primary/50 outline-none transition-all placeholder:text-slate-600"
-                                            />
-                                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-primary transition-colors">
-                                                <FiUser size={18} />
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    {/* COMPANY */}
-                                    <div className="space-y-2">
-                                        <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider pl-1">
-                                            Company
-                                        </label>
-                                        <div className="relative group">
-                                            <input
-                                                type="text"
-                                                required
-                                                value={company}
-                                                onChange={(e) => setCompany(e.target.value)}
-                                                placeholder="Acme Corp"
-                                                className="w-full h-12 pl-11 pr-4 rounded-xl border border-white/10 bg-[#0B1120] text-white text-sm focus:ring-2 focus:ring-primary/50 focus:border-primary/50 outline-none transition-all placeholder:text-slate-600"
-                                            />
-                                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-primary transition-colors">
-                                                <FiBriefcase size={18} />
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* EMAIL */}
-                                <div className="space-y-2">
-                                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider pl-1">
-                                        Work Email
-                                    </label>
-                                    <div className="relative group">
-                                        <input
-                                            type="email"
-                                            required
-                                            value={email}
-                                            onChange={(e) => setEmail(e.target.value)}
-                                            placeholder="name@company.com"
-                                            className="w-full h-12 pl-11 pr-4 rounded-xl border border-white/10 bg-[#0B1120] text-white text-sm focus:ring-2 focus:ring-primary/50 focus:border-primary/50 outline-none transition-all placeholder:text-slate-600"
-                                        />
-                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-primary transition-colors">
-                                            <FiMail size={18} />
-                                        </span>
-                                    </div>
-                                </div>
-
-                                {/* PASSWORD */}
-                                <div className="space-y-2">
-                                    <div className="flex justify-between items-center pl-1">
-                                        <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                                            Password
-                                        </label>
-                                    </div>
-                                    <div className="relative group">
-                                        <input
-                                            type={showPassword ? "text" : "password"}
-                                            required
-                                            value={password}
-                                            onChange={(e) => setPassword(e.target.value)}
-                                            placeholder="••••••••"
-                                            className="w-full h-12 pl-11 pr-12 rounded-xl border border-white/10 bg-[#0B1120] text-white text-sm focus:ring-2 focus:ring-primary/50 focus:border-primary/50 outline-none transition-all placeholder:text-slate-600"
-                                        />
-                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-primary transition-colors">
-                                            <FiLock size={18} />
-                                        </span>
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowPassword(!showPassword)}
-                                            className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors"
-                                        >
-                                            {showPassword ? <FiEyeOff /> : <FiEye />}
-                                        </button>
-                                    </div>
-                                </div>
-
-                                {/* SUBMIT */}
-                                <button
-                                    type="submit"
-                                    disabled={loading}
-                                    className={`w-full h-12 bg-primary hover:bg-primary-light text-white rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/25 ${loading ? 'opacity-70 cursor-wait' : 'hover:-translate-y-0.5'}`}
-                                >
-                                    {loading ? 'Creating Account...' : 'Create Account'}
-                                    <FiArrowRight size={18} />
-                                </button>
-                            </form>
-
-                            {/* SIGN IN LINK */}
-                            <div className="mt-8 pt-6 border-t border-white/5 text-center">
-                                <p className="text-sm text-slate-400">
-                                    Already have an account?{" "}
-                                    <Link to="/login" className="text-primary font-bold hover:text-primary-light transition-colors ml-1">
-                                        Sign In
-                                    </Link>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </main>
-            {/* Footer Info */}
-            <div className="absolute bottom-6 left-8 flex items-center gap-3 text-[11px] text-slate-600 font-medium">
-                <FiSecureLock size={12} /> Secure Recruiter Access Only
-                <span className="text-slate-800">|</span>
-                v4.2.0-stable
-            </div>
-            <div className="absolute bottom-6 right-8 flex items-center gap-6 text-[10px] text-slate-600 font-bold uppercase tracking-widest">
-                <span className="hover:text-slate-400 cursor-pointer transition-colors">Security Policy</span>
-                <span className="hover:text-slate-400 cursor-pointer transition-colors">Trust Center</span>
-                <span className="hover:text-slate-400 cursor-pointer transition-colors">System Status</span>
             </div>
         </div>
     );

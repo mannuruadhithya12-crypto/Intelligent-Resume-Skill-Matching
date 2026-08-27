@@ -7,18 +7,23 @@ export default {
   theme: {
     extend: {
       colors: {
-        'bg-deep': '#050B14', // Base app background
-        'bg-card': '#0f172a', // Required card background
+        // Stitch Design System Colors
+        'primary': '#137fec',
+        'background-light': '#f6f7f8',
+        'background-dark': '#101922',
+
+        // Legacy / Existing App Backgrounds
+        'bg-deep': '#050B14', 
+        'bg-card': '#0f172a', 
         'bg-card-hover': '#1e293b',
-        'border-subtle': '#1f2937', // border-gray-800 equivalent
+        'border-subtle': '#1f2937', 
         'border-highlight': 'rgba(99, 102, 241, 0.5)',
 
-        'primary': '#2563eb', // blue-600
-        'primary-glow': '#3b82f6', // blue-500
-        'secondary': '#9333ea', // purple-600
+        'primary-glow': '#3b82f6',
+        'secondary': '#9333ea',
 
         'text-main': '#f8fafc',
-        'text-muted': '#9ca3af', // gray-400
+        'text-muted': '#9ca3af',
 
         'success': '#10b981',
         'warning': '#f59e0b',
