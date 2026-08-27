@@ -2,8 +2,8 @@ import React from 'react';
 
 export default function Footer() {
     return (
-        <footer className="border-t border-border-subtle px-8 py-6 text-xs text-gray-500 text-center">
-            © 2024 RecruitAI Enterprise. Built for High-Performance Teams.
+        <footer className="border-t border-[#E9E1DC] px-8 py-8 text-xs text-outline text-center bg-page">
+            © {new Date().getFullYear()} RecruitAI Enterprise. Designed for human-centric recruitment.
         </footer>
     );
 }

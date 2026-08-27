@@ -1,152 +1,201 @@
-import React from 'react';
-import { FiX, FiCheck, FiMinus, FiAward, FiBriefcase, FiAlertCircle } from 'react-icons/fi';
+import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import { FiX } from 'react-icons/fi';
 
 export default function ComparisonView({ candidates, onClose }) {
+    // Body scroll lock
+    useEffect(() => {
+        const originalStyle = window.getComputedStyle(document.body).overflow;
+        document.body.style.overflow = 'hidden';
+        return () => {
+            document.body.style.overflow = originalStyle;
+        };
+    }, []);
+
+    // Close on Escape
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.key === 'Escape') {
+                onClose();
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [onClose]);
+
     if (!candidates || candidates.length === 0) return null;
 
-    // Get the winner for scoring
-    const maxScore = Math.max(...candidates.map(c => c.final_score));
+    const maxScore = Math.max(...candidates.map(c => c.final_score || 0));
 
-    return (
-        <div className="fixed inset-0 z-[100] bg-slate-900/90 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
-            <div className="bg-white dark:bg-bg-card w-full max-w-[98vw] h-[92vh] rounded-3xl shadow-2xl flex flex-col border border-slate-200 dark:border-border-subtle overflow-hidden">
+    // Handle missing/empty arrays safely
+    const getSkills = (c) => c.matched_skills || [];
+    const getGaps = (c) => c.missing_skills || [];
+
+    const modalContent = (
+        <div 
+            className="fixed inset-0 z-[100] bg-[#181D1A]/50 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 lg:p-8 animate-fade-in"
+            onClick={onClose}
+        >
+            <div 
+                className="bg-[#FFFDF9] border border-[#E5DED4] w-full max-w-[1320px] rounded-[20px] shadow-[0_24px_80px_rgba(30,27,24,0.22)] flex flex-col overflow-hidden relative z-[110]"
+                style={{ width: 'min(1280px, calc(100vw - 64px))', height: 'min(820px, calc(100vh - 64px))' }}
+                onClick={(e) => e.stopPropagation()}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="comparison-title"
+            >
                 {/* Header */}
-                <div className="p-8 border-b border-slate-100 dark:border-border-subtle flex justify-between items-center bg-slate-50/50 dark:bg-bg-deep/50">
+                <div className="flex-shrink-0 h-[88px] lg:h-[100px] px-8 py-6 border-b border-[#E6E0D8] bg-[#FFFDF9] flex justify-between items-center z-[120]">
                     <div>
-                        <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Candidate Comparison</h2>
-                        <p className="text-slate-500 dark:text-slate-400 font-medium mt-1">Analyzing {candidates.length} profiles side-by-side</p>
+                        <h2 id="comparison-title" className="text-[28px] lg:text-[32px] font-serif font-semibold text-[#211F1B] leading-tight">
+                            Candidate Comparison
+                        </h2>
+                        <p className="text-[14px] lg:text-[15px] text-[#706B63] mt-1">
+                            Compare selected candidates side-by-side
+                        </p>
                     </div>
                     <button
                         onClick={onClose}
-                        className="p-3 bg-white dark:bg-bg-card border border-slate-200 dark:border-border-subtle rounded-full hover:bg-slate-50 dark:hover:bg-white/10 transition-colors shadow-sm text-slate-500 dark:text-white group"
+                        aria-label="Close comparison"
+                        className="w-[40px] h-[40px] flex items-center justify-center rounded-xl bg-transparent hover:bg-[#F2EEE7] active:scale-95 transition-all text-[#211F1B] focus:outline-none focus:ring-2 focus:ring-[#3F7655]/50"
                     >
-                        <FiX size={24} className="group-hover:rotate-90 transition-transform" />
+                        <FiX size={24} />
                     </button>
                 </div>
 
-                {/* Content Grid */}
-                <div className="flex-1 overflow-auto scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600 scrollbar-track-transparent">
-                    <div className="min-w-fit">
-                        <div className="grid" style={{ gridTemplateColumns: `280px repeat(${candidates.length}, minmax(320px, 1fr))` }}>
-
-                            {/* 1. Header Row (Avatars) */}
-                            <div className="p-6 flex flex-col justify-end border-b border-slate-100 dark:border-border-subtle bg-slate-50/30 dark:bg-bg-deep/30">
-                                <span className="text-xs font-black uppercase text-slate-400 tracking-wider mb-2">PROFILES</span>
-                                <h3 className="text-xl font-bold text-slate-900 dark:text-white">Candidates</h3>
+                {/* Body (Scrollable) */}
+                <div className="flex-1 overflow-y-auto min-h-0 bg-[#FFFDF9] scrollbar-thin scrollbar-thumb-[#D9D2C8] scrollbar-track-transparent">
+                    <div className="min-w-[800px]">
+                        {/* Grid Structure */}
+                        <div className="grid" style={{ gridTemplateColumns: `220px repeat(${candidates.length}, minmax(0, 1fr))` }}>
+                            
+                            {/* Candidate Headers */}
+                            <div className="p-6 border-b border-[#ECE7E0] bg-[#FFFDF9]">
+                                {/* Empty top-left cell */}
                             </div>
                             {candidates.map((c, i) => (
-                                <div key={i} className={`p-6 border-b border-l border-slate-100 dark:border-border-subtle flex flex-col items-center text-center relative ${c.final_score === maxScore ? 'bg-blue-50/10 dark:bg-blue-900/5' : ''}`}>
+                                <div key={i} className="p-6 border-b border-l border-[#ECE7E0] bg-[#F3EEE7] flex flex-col items-center text-center relative">
                                     {c.final_score === maxScore && (
-                                        <div className="absolute top-0 mt-3 left-1/2 -translate-x-1/2 bg-yellow-400 text-yellow-900 text-[10px] font-black px-3 py-1 rounded-full shadow-md flex items-center gap-1 uppercase tracking-wider border border-yellow-300 z-10">
-                                            <FiAward size={12} /> Top Match
+                                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#E8F1DC] text-[#356047] text-[11px] font-bold px-3 py-1.5 rounded-full uppercase tracking-wide border border-[#C9DEC2] shadow-sm whitespace-nowrap">
+                                            ★ Top Match
                                         </div>
                                     )}
-                                    <div className="w-20 h-20 rounded-2xl bg-slate-100 dark:bg-bg-deep mb-4 shadow-sm overflow-hidden p-1 border border-slate-200 dark:border-border-subtle">
+                                    <div className="w-[64px] h-[64px] rounded-full bg-white mb-4 shadow-sm overflow-hidden p-1 border border-[#E4DED5]">
                                         <img
                                             src={`https://api.dicebear.com/7.x/initials/svg?seed=${c.filename}`}
                                             alt={c.filename}
-                                            className="w-full h-full rounded-xl object-cover"
+                                            className="w-full h-full rounded-full object-cover bg-[#F7F3EC]"
                                         />
                                     </div>
-                                    <h4 className="font-bold text-lg text-slate-900 dark:text-white w-full truncate px-4" title={c.filename}>
+                                    <h4 className="font-semibold text-[18px] lg:text-[20px] text-[#211F1B] w-full truncate px-2" title={c.filename}>
                                         {c.filename.replace(/_/g, ' ').replace(/\.[^/.]+$/, "")}
                                     </h4>
-                                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium">{c.email || 'Candidate via Upload'}</p>
+                                    <p className="text-[14px] text-[#706B63] mt-1">{c.current_role || 'Candidate'}</p>
+                                    <p className="text-[12px] text-[#706B63] uppercase tracking-[0.08em] mt-2 font-medium">#{Math.random().toString(36).substring(2, 8)}</p>
                                 </div>
                             ))}
 
-                            {/* 2. Match Score */}
-                            <div className="p-6 border-b border-slate-100 dark:border-border-subtle font-bold text-slate-500 dark:text-slate-400 flex items-center">
-                                Match Score
+                            {/* Match Score */}
+                            <div className="px-6 py-6 border-b border-[#ECE7E0] flex items-center">
+                                <span className="text-[13px] font-bold text-[#706B63] uppercase tracking-[0.08em]">Match Score</span>
                             </div>
                             {candidates.map((c, i) => (
-                                <div key={i} className="p-6 border-b border-l border-slate-100 dark:border-border-subtle flex flex-col justify-center">
-                                    <div className="flex items-end gap-2 mb-2">
-                                        <span className={`text-4xl font-black ${c.final_score >= 80 ? 'text-blue-600 dark:text-blue-400' : c.final_score >= 60 ? 'text-slate-700 dark:text-slate-300' : 'text-amber-500'}`}>
-                                            {Math.round(c.final_score)}%
-                                        </span>
+                                <div key={i} className="px-6 py-8 border-b border-l border-[#ECE7E0] flex flex-col justify-center items-center">
+                                    <div className="text-[36px] lg:text-[42px] font-bold text-[#211F1B] font-serif leading-none mb-3">
+                                        {Math.round(c.final_score || 0)}%
                                     </div>
-                                    <div className="w-full h-2.5 bg-slate-100 dark:bg-bg-deep rounded-full overflow-hidden">
-                                        <div className={`h-full rounded-full transition-all ${c.final_score >= 80 ? 'bg-blue-600' : c.final_score >= 60 ? 'bg-slate-600' : 'bg-amber-500'}`} style={{ width: `${c.final_score}%` }}></div>
+                                    <div className="w-full max-w-[160px] h-[8px] bg-[#E9E4DC] rounded-full overflow-hidden">
+                                        <div className="h-full bg-[#3F7655] rounded-full" style={{ width: `${Math.min(Math.max(c.final_score || 0, 0), 100)}%` }}></div>
                                     </div>
                                 </div>
                             ))}
 
-                            {/* 3. Experience */}
-                            <div className="p-6 border-b border-slate-100 dark:border-border-subtle font-bold text-slate-500 dark:text-slate-400 flex items-center gap-2">
-                                <FiBriefcase /> Experience
+                            {/* Experience */}
+                            <div className="px-6 py-6 border-b border-[#ECE7E0] flex items-center">
+                                <span className="text-[13px] font-bold text-[#706B63] uppercase tracking-[0.08em]">Experience</span>
                             </div>
                             {candidates.map((c, i) => (
-                                <div key={i} className="p-6 border-b border-l border-slate-100 dark:border-border-subtle hover:bg-slate-50/50 dark:hover:bg-white/5 transition-colors">
-                                    <p className={`font-bold text-lg ${c.experience_years ? 'text-slate-900 dark:text-white' : 'text-slate-400 dark:text-slate-500 italic'}`}>
-                                        {c.experience_years ? (
-                                            <>
-                                                <span className="text-2xl text-blue-600 dark:text-blue-400 mr-1">{c.experience_years}</span> <span className="text-sm uppercase text-slate-500 dark:text-slate-400">Years</span>
-                                            </>
-                                        ) : 'Not specified'}
-                                    </p>
-                                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
-                                        {c.experience_summary || "See full analysis for detailed work history."}
-                                    </p>
+                                <div key={i} className="px-6 py-6 border-b border-l border-[#ECE7E0] flex items-center">
+                                    <span className={`text-[15px] ${c.experience_years ? 'text-[#211F1B]' : 'text-[#706B63]'}`}>
+                                        {c.experience_years ? `${c.experience_years} Years` : 'Not specified'}
+                                    </span>
                                 </div>
                             ))}
 
-                            {/* 4. Skills Match */}
-                            <div className="p-6 border-b border-slate-100 dark:border-border-subtle font-bold text-slate-500 dark:text-slate-400 flex items-center gap-2">
-                                <FiCheck className="text-emerald-500" /> Matched Skills
+                            {/* Skills */}
+                            <div className="px-6 py-6 border-b border-[#ECE7E0] flex items-start pt-8">
+                                <span className="text-[13px] font-bold text-[#706B63] uppercase tracking-[0.08em]">Matched Skills</span>
                             </div>
-                            {candidates.map((c, i) => (
-                                <div key={i} className="p-6 border-b border-l border-slate-100 dark:border-border-subtle hover:bg-slate-50/50 dark:hover:bg-white/5 transition-colors">
-                                    <div className="flex flex-wrap gap-2">
-                                        {c.matched_skills && c.matched_skills.length > 0 ? (
-                                            c.matched_skills.map((skill, idx) => (
-                                                <span key={idx} className="px-3 py-1 bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 text-xs font-black rounded-lg border border-emerald-200 dark:border-emerald-500/30 uppercase tracking-wide shadow-sm">
-                                                    {skill}
+                            {candidates.map((c, i) => {
+                                const skills = getSkills(c);
+                                return (
+                                    <div key={i} className="px-6 py-6 border-b border-l border-[#ECE7E0] flex flex-wrap gap-2 content-start">
+                                        {skills.length > 0 ? (
+                                            skills.map((skill, idx) => (
+                                                <span key={idx} className="px-2.5 py-1.5 bg-[#EDF5E5] text-[#315C43] text-[12px] font-semibold rounded-full border border-[#C9DEC2]">
+                                                    ✓ {skill}
                                                 </span>
                                             ))
                                         ) : (
-                                            <span className="text-slate-400 italic text-sm">No specific skills matched</span>
+                                            <span className="text-[#706B63] text-[14px]">No specific skills matched</span>
                                         )}
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
 
-                            {/* 5. Gaps / Missing */}
-                            <div className="p-6 border-b border-slate-100 dark:border-border-subtle font-bold text-slate-500 dark:text-slate-400 flex items-center gap-2">
-                                <FiAlertCircle className="text-amber-500" /> Potential Gaps
+                            {/* Gaps */}
+                            <div className="px-6 py-6 border-b border-[#ECE7E0] flex items-start pt-8">
+                                <span className="text-[13px] font-bold text-[#706B63] uppercase tracking-[0.08em]">Skill Gaps</span>
                             </div>
-                            {candidates.map((c, i) => (
-                                <div key={i} className="p-6 border-b border-l border-slate-100 dark:border-border-subtle bg-slate-50/30 dark:bg-black/20 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
-                                    <div className="flex flex-wrap gap-2">
-                                        {c.missing_skills && c.missing_skills.length > 0 ? (
-                                            c.missing_skills.slice(0, 5).map((skill, idx) => (
-                                                <span key={idx} className="px-3 py-1 bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-300 text-xs font-medium rounded-lg border border-red-200 dark:border-red-500/30 opacity-90 group-hover:opacity-100 transition-opacity">
-                                                    {skill}
+                            {candidates.map((c, i) => {
+                                const gaps = getGaps(c);
+                                return (
+                                    <div key={i} className="px-6 py-6 border-b border-l border-[#ECE7E0] flex flex-wrap gap-2 content-start">
+                                        {gaps.length > 0 ? (
+                                            gaps.map((skill, idx) => (
+                                                <span key={idx} className="px-2.5 py-1.5 bg-[#F8ECE7] text-[#8B5145] text-[12px] font-medium rounded-full border border-[#E7C9BE]">
+                                                    − {skill}
                                                 </span>
                                             ))
                                         ) : (
-                                            <span className="text-emerald-600 dark:text-emerald-400 text-xs font-bold flex items-center gap-1">
-                                                <FiCheck /> Strong match profile
+                                            <span className="text-[#3F7655] text-[14px] font-medium flex items-center gap-1.5">
+                                                ✓ Strong match profile
                                             </span>
                                         )}
-                                        {c.missing_skills && c.missing_skills.length > 5 && (
-                                            <span className="text-xs text-slate-400 pt-1 font-bold">+{c.missing_skills.length - 5} more</span>
-                                        )}
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
 
+                            {/* Recommendation */}
+                            <div className="px-6 py-6 border-b border-[#ECE7E0] flex items-center">
+                                <span className="text-[13px] font-bold text-[#706B63] uppercase tracking-[0.08em]">Recommendation</span>
+                            </div>
+                            {candidates.map((c, i) => {
+                                const isTop = c.final_score === maxScore;
+                                return (
+                                    <div key={i} className="px-6 py-6 border-b border-l border-[#ECE7E0] flex items-center">
+                                        <span className={`text-[15px] font-medium ${isTop ? 'text-[#3F7655]' : 'text-[#706B63]'}`}>
+                                            {isTop ? 'Recommended' : 'Good Match'}
+                                        </span>
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
                 </div>
 
-                {/* Footer Actions */}
-                <div className="p-6 border-t border-slate-100 dark:border-border-subtle bg-white dark:bg-bg-card flex justify-end">
-                    <button onClick={onClose} className="px-8 py-3 bg-slate-900 dark:bg-white text-white dark:text-bg-deep font-bold rounded-xl shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all">
+                {/* Footer */}
+                <div className="flex-shrink-0 h-[72px] lg:h-[80px] px-8 bg-[#FFFDF9] border-t border-[#E6E0D8] flex items-center justify-end z-[120]">
+                    <button 
+                        onClick={onClose} 
+                        className="h-[44px] px-5 bg-white border border-[#D9D2C8] text-[#24221E] text-[14px] font-semibold rounded-xl hover:bg-[#F3EFE8] active:translate-y-[1px] transition-all"
+                    >
                         Close Comparison
                     </button>
                 </div>
             </div>
         </div>
     );
+
+    return createPortal(modalContent, document.body);
 }

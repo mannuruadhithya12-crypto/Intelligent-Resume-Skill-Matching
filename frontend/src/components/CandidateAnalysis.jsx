@@ -1,7 +1,8 @@
 /* eslint-disable react/prop-types */
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getResults, updateCandidateStatus, scheduleInterview } from '../api';
+import { getResults, updateCandidateStatus } from '../api';
+import InterviewModal from './InterviewModal';
 
 export default function CandidateAnalysis() {
     const navigate = useNavigate();
@@ -14,14 +15,6 @@ export default function CandidateAnalysis() {
     const [showScheduleModal, setShowScheduleModal] = useState(false);
     const [showAuditModal, setShowAuditModal] = useState(false);
     const [notification, setNotification] = useState(null);
-
-    // Scheduling State
-    const [scheduleData, setScheduleData] = useState({
-        date: '',
-        time: '',
-        type: 'video',
-        notes: ''
-    });
 
     useEffect(() => {
         const fetchData = async () => {
@@ -63,20 +56,14 @@ export default function CandidateAnalysis() {
         }
     };
 
-    const handleScheduleSubmit = async (e) => {
-        e.preventDefault();
+    const handleScheduleSuccess = async () => {
         try {
-            await scheduleInterview({
-                job_id: jobId,
-                candidate_filename: candidate.filename,
-                ...scheduleData
-            });
             await handleStatusUpdate('interview_scheduled');
             setShowScheduleModal(false);
             showToast('Interview scheduled successfully!', 'success');
         } catch (err) {
             console.error(err);
-            showToast('Failed to schedule interview', 'error');
+            showToast('Failed to update status', 'error');
         }
     };
 
@@ -91,21 +78,21 @@ export default function CandidateAnalysis() {
 
     if (loading) return (
         <div className="flex justify-center items-center h-[60vh] flex-col gap-6">
-            <div className="w-16 h-16 border-4 border-[#f0f2f4] dark:border-gray-800 border-t-primary rounded-full animate-spin"></div>
-            <p className="text-[#617589] dark:text-gray-400 font-medium animate-pulse">Compiling candidate dossier...</p>
+            <div className="w-16 h-16 border-4 border-[#F5ECE7] border-t-primary-sage rounded-full animate-spin"></div>
+            <p className="text-text-secondary font-medium animate-pulse">Compiling candidate dossier...</p>
         </div>
     );
 
     if (error || !candidate) return (
         <div className="flex justify-center items-center h-[60vh]">
-            <div className="text-center bg-white dark:bg-[#111418] p-10 rounded-xl border border-red-500/20 shadow-sm">
-                <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <span className="material-symbols-outlined text-red-500 text-4xl">warning</span>
+            <div className="text-center bg-white p-10 rounded-[24px] shadow-paper">
+                <div className="size-20 bg-error/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <span className="material-symbols-outlined text-error text-[32px]">warning</span>
                 </div>
-                <h2 className="text-2xl font-bold text-[#111418] dark:text-white mb-2">Access Denied</h2>
-                <p className="text-[#617589] dark:text-gray-400 font-medium mb-6">{error || "Candidate profile inaccessible"}</p>
-                <button onClick={() => navigate('/candidates')} className="bg-[#f0f2f4] dark:bg-gray-800 text-[#111418] dark:text-white px-6 py-2.5 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition flex items-center justify-center gap-2 mx-auto font-bold">
-                    <span className="material-symbols-outlined text-sm">arrow_back</span> Return to Talent Pool
+                <h2 className="text-2xl font-serif font-bold text-text-primary mb-2">Access Denied</h2>
+                <p className="text-text-secondary font-medium mb-8">{error || "Candidate profile inaccessible"}</p>
+                <button onClick={() => navigate('/candidates')} className="bg-[#F5ECE7] text-text-primary px-6 py-3 rounded-full hover:bg-outline-variant transition-colors flex items-center justify-center gap-2 mx-auto font-bold text-[14px]">
+                    <span className="material-symbols-outlined text-[18px]">arrow_back</span> Return to Talent Pool
                 </button>
             </div>
         </div>
@@ -127,52 +114,52 @@ export default function CandidateAnalysis() {
     const strokeDashoffset = circumference - (candidate.final_score / 100) * circumference;
 
     return (
-        <div className="min-h-screen bg-background-light dark:bg-background-dark font-display text-[#111418] dark:text-white pb-20 pt-8 animate-fade-in">
+        <div className="w-full font-sans text-text-primary pb-20 pt-4 animate-fade-in relative">
             {notification && (
-                <div className={`fixed top-24 right-6 z-[100] px-6 py-4 rounded-xl shadow-sm border flex items-center gap-3 animate-fade-in-up print:hidden ${
-                    notification.type === 'error' ? 'bg-white dark:bg-[#111418] text-red-600 dark:text-red-400 border-red-500/30' :
-                    notification.type === 'info' ? 'bg-white dark:bg-[#111418] text-primary border-primary/30' :
-                    'bg-white dark:bg-[#111418] text-green-600 dark:text-green-400 border-green-500/30'
+                <div className={`fixed top-24 right-6 z-[100] px-6 py-4 rounded-[12px] shadow-paper flex items-center gap-3 animate-fade-in-up print:hidden ${
+                    notification.type === 'error' ? 'bg-white text-error border border-error/20' :
+                    notification.type === 'info' ? 'bg-white text-primary-sage border border-[#CAECBC]' :
+                    'bg-white text-[#4A6741] border border-[#CAECBC]'
                 }`}>
-                    <div className={`p-2 rounded-full ${notification.type === 'error' ? 'bg-red-500/10' : notification.type === 'info' ? 'bg-primary/10' : 'bg-green-500/10'}`}>
-                        <span className="material-symbols-outlined text-sm">{notification.type === 'error' ? 'warning' : 'check'}</span>
+                    <div className={`p-2 rounded-full ${notification.type === 'error' ? 'bg-error/10' : notification.type === 'info' ? 'bg-[#CAECBC]/30' : 'bg-[#CAECBC]/30'}`}>
+                        <span className="material-symbols-outlined text-[18px]">{notification.type === 'error' ? 'warning' : 'check'}</span>
                     </div>
-                    <span className="font-bold text-sm">{notification.message}</span>
+                    <span className="font-bold text-[14px]">{notification.message}</span>
                 </div>
             )}
 
-            <main className="max-w-7xl mx-auto px-4 md:px-8">
+            <main className="max-w-[1200px] mx-auto w-full">
                 {/* Breadcrumbs */}
-                <div className="flex flex-wrap gap-2 mb-4 print:hidden">
-                    <span className="cursor-pointer text-[#617589] dark:text-gray-400 text-sm font-medium hover:text-primary transition-colors" onClick={() => navigate('/candidates')}>Candidates</span>
-                    <span className="text-[#617589] dark:text-gray-500 text-sm font-medium">/</span>
-                    <span className="text-[#617589] dark:text-gray-400 text-sm font-medium">{roleTitle}</span>
-                    <span className="text-[#617589] dark:text-gray-500 text-sm font-medium">/</span>
-                    <span className="text-[#111418] dark:text-white text-sm font-bold">Analysis: {displayName}</span>
+                <div className="flex flex-wrap items-center gap-2 mb-6 print:hidden">
+                    <span className="cursor-pointer text-outline text-[13px] font-bold hover:text-text-primary transition-colors" onClick={() => navigate('/candidates')}>Talent Pool</span>
+                    <span className="text-outline text-[13px] font-bold">/</span>
+                    <span className="text-text-secondary text-[13px] font-bold">{roleTitle}</span>
+                    <span className="text-outline text-[13px] font-bold">/</span>
+                    <span className="text-text-primary text-[13px] font-bold">{displayName}</span>
                 </div>
 
                 {/* Profile Header */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-white dark:bg-[#111418] p-6 rounded-xl border border-[#f0f2f4] dark:border-gray-800 shadow-sm mb-8">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-white p-8 rounded-[24px] shadow-paper mb-8 border border-[#E9E1DC]">
                     <div className="flex gap-6 items-center">
-                        <div className="bg-center bg-no-repeat aspect-square bg-cover bg-[#f0f2f4] dark:bg-gray-800 rounded-full h-24 w-24 border-4 border-primary/20 flex items-center justify-center overflow-hidden">
+                        <div className="size-[100px] bg-page rounded-full border border-[#E9E1DC] flex items-center justify-center overflow-hidden flex-shrink-0 shadow-sm">
                             {candidate.email ?
-                                <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${candidate.email}`} alt="Avatar" className="w-full h-full object-cover" />
-                                : <span className="material-symbols-outlined text-4xl text-[#617589]">person</span>
+                                <img src={`https://api.dicebear.com/7.x/initials/svg?seed=${candidate.email}&backgroundColor=F5ECE7&textColor=1E1B18`} alt="Avatar" className="w-full h-full object-cover" />
+                                : <span className="material-symbols-outlined text-[40px] text-outline">person</span>
                             }
                         </div>
                         <div className="flex flex-col">
-                            <div className="flex items-center gap-3">
-                                <h1 className="text-[#111418] dark:text-white text-3xl font-black tracking-tight">{displayName}</h1>
-                                <span className="bg-primary/10 text-primary text-xs font-bold px-2 py-1 rounded">ID: #{candidate.filename.substring(0,5).toUpperCase() || '44921'}</span>
+                            <div className="flex items-center gap-4">
+                                <h1 className="text-text-primary text-[32px] font-serif font-bold tracking-tight leading-none">{displayName}</h1>
+                                <span className="bg-[#F5ECE7] text-text-secondary text-[11px] font-bold px-2 py-1 rounded-md tracking-wider">ID: #{candidate.filename.substring(0,5).toUpperCase() || '44921'}</span>
                             </div>
-                            <p className="text-[#617589] dark:text-gray-400 text-base font-normal mt-1">Applied for {roleTitle}</p>
-                            <div className="flex flex-wrap gap-2 mt-2">
-                                <span className="inline-flex items-center gap-1 bg-[#f0f2f4] dark:bg-gray-800 text-[#111418] dark:text-gray-300 px-3 py-0.5 rounded-full text-xs font-bold uppercase">
-                                    <span className="material-symbols-outlined text-xs">work</span> {candidate.status.replace('_', ' ')}
+                            <p className="text-text-secondary text-[15px] mt-2">Applied for {roleTitle}</p>
+                            <div className="flex flex-wrap gap-2 mt-3">
+                                <span className="inline-flex items-center gap-1.5 bg-[#F5ECE7] text-text-primary px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider">
+                                    <span className="material-symbols-outlined text-[14px]">work</span> {candidate.status.replace('_', ' ')}
                                 </span>
                                 {candidate.match_classification?.includes('Excellent') && (
-                                    <span className="inline-flex items-center gap-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-3 py-0.5 rounded-full text-xs font-bold uppercase">
-                                        <span className="material-symbols-outlined text-xs">auto_awesome</span> High Confidence
+                                    <span className="inline-flex items-center gap-1.5 bg-[#CAECBC]/30 text-primary-sage px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider">
+                                        <span className="material-symbols-outlined text-[14px]">auto_awesome</span> High Confidence
                                     </span>
                                 )}
                             </div>
@@ -180,14 +167,14 @@ export default function CandidateAnalysis() {
                     </div>
                     <div className="flex gap-3 w-full md:w-auto flex-wrap print:hidden">
                         {candidate.status !== 'rejected' && (
-                            <button onClick={() => handleStatusUpdate('rejected')} className="flex-1 md:flex-none flex items-center justify-center gap-2 rounded-lg h-10 px-4 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm font-bold hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors">
-                                <span className="material-symbols-outlined text-sm">cancel</span> Reject
+                            <button onClick={() => handleStatusUpdate('rejected')} className="flex-1 md:flex-none flex items-center justify-center gap-2 rounded-full h-[44px] px-6 bg-error/10 text-error text-[13px] font-bold hover:bg-error/20 transition-colors shadow-sm cursor-pointer opacity-100">
+                                <span className="material-symbols-outlined text-[18px]">cancel</span> Reject
                             </button>
                         )}
-                        <button onClick={handlePrint} className="flex-1 md:flex-none flex items-center justify-center gap-2 rounded-lg h-10 px-4 bg-[#f0f2f4] dark:bg-gray-800 text-[#111418] dark:text-white text-sm font-bold hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
-                            <span className="material-symbols-outlined text-sm">download</span> Export
+                        <button onClick={handlePrint} className="flex-1 md:flex-none flex items-center justify-center gap-2 rounded-full h-[44px] px-6 bg-white border border-[#E9E1DC] text-[#272521] text-[13px] font-bold hover:bg-[#F5ECE7] transition-all shadow-sm cursor-pointer opacity-100">
+                            <span className="material-symbols-outlined text-[18px]">download</span> Export
                         </button>
-                        <button onClick={() => setShowScheduleModal(true)} className="flex-1 md:flex-none rounded-lg h-10 px-6 bg-primary text-white text-sm font-bold hover:bg-primary/90 shadow-md transition-colors">
+                        <button onClick={() => setShowScheduleModal(true)} className="flex-1 md:flex-none rounded-full h-[44px] px-8 bg-[#3F7655] text-white border border-[#3F7655] text-[13px] font-semibold hover:bg-[#315F44] active:translate-y-[1px] focus:ring-2 focus:ring-[#3F7655]/50 focus:outline-none shadow-sm transition-all cursor-pointer opacity-100">
                             Move to Interview
                         </button>
                     </div>
@@ -196,32 +183,32 @@ export default function CandidateAnalysis() {
                 {/* Analysis Dashboard Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                     {/* Match Score Prominent Section */}
-                    <div className="lg:col-span-12 bg-white dark:bg-[#111418] p-8 rounded-xl border border-[#f0f2f4] dark:border-gray-800 shadow-sm flex flex-col md:flex-row items-center justify-center gap-12">
+                    <div className="lg:col-span-12 bg-white p-10 rounded-[24px] shadow-paper border border-[#E9E1DC] flex flex-col md:flex-row items-center justify-center gap-16">
                         <div className="relative flex items-center justify-center">
-                            <svg className="size-48 transform -rotate-90">
-                                <circle className="text-[#f0f2f4] dark:text-gray-800" cx="96" cy="96" fill="transparent" r="88" stroke="currentColor" strokeWidth="12"></circle>
-                                <circle className="text-primary transition-all duration-1000 ease-out" cx="96" cy="96" fill="transparent" r="88" stroke="currentColor" strokeDasharray={circumference} strokeDashoffset={strokeDashoffset} strokeWidth="12" strokeLinecap="round"></circle>
+                            <svg className="size-[200px] transform -rotate-90">
+                                <circle className="text-[#F5ECE7]" cx="100" cy="100" fill="transparent" r="88" stroke="currentColor" strokeWidth="12"></circle>
+                                <circle className="text-primary-sage transition-all duration-1000 ease-out" cx="100" cy="100" fill="transparent" r="88" stroke="currentColor" strokeDasharray={circumference} strokeDashoffset={strokeDashoffset} strokeWidth="12" strokeLinecap="round"></circle>
                             </svg>
-                            <div className="absolute flex flex-col items-center">
-                                <span className="text-5xl font-black text-[#111418] dark:text-white">{Math.round(candidate.final_score)}%</span>
-                                <span className="text-sm font-bold text-[#617589] dark:text-gray-400 uppercase tracking-widest">Match Score</span>
+                            <div className="absolute flex flex-col items-center mt-2">
+                                <span className="text-[48px] font-serif font-bold text-text-primary leading-none">{Math.round(candidate.final_score)}%</span>
+                                <span className="text-[11px] font-bold text-text-secondary uppercase tracking-[0.2em] mt-1">Match</span>
                             </div>
                         </div>
                         <div className="max-w-xl text-center md:text-left">
-                            <h3 className="text-2xl font-bold mb-3">AI Analysis Summary</h3>
-                            <p className="text-[#617589] dark:text-gray-400 text-base leading-relaxed mb-4">
+                            <h3 className="text-[24px] font-serif font-bold text-text-primary mb-3">AI Analysis Summary</h3>
+                            <p className="text-text-secondary text-[15px] leading-relaxed mb-6">
                                 {displayName} shows {candidate.final_score > 80 ? 'exceptional' : candidate.final_score > 60 ? 'moderate' : 'low'} alignment with the technical requirements.
-                                Their profile demonstrates competency in core areas such as {matchedSkills[0] || 'software development'} and {matchedSkills[1] || 'system architecture'}.
+                                Their profile demonstrates competency in core areas such as <span className="font-bold text-text-primary">{matchedSkills[0] || 'software development'}</span> and <span className="font-bold text-text-primary">{matchedSkills[1] || 'system architecture'}</span>.
                             </p>
-                            <div className="flex flex-wrap justify-center md:justify-start gap-4">
-                                <div className="flex flex-col">
-                                    <span className="text-xs text-[#617589] dark:text-gray-500 font-bold uppercase">Data Points</span>
-                                    <span className="text-lg font-bold">140+ Sources</span>
+                            <div className="flex flex-wrap justify-center md:justify-start gap-6">
+                                <div className="flex flex-col gap-1">
+                                    <span className="text-[11px] text-outline font-bold uppercase tracking-wider">Data Points</span>
+                                    <span className="text-[16px] font-bold text-text-primary">140+ Sources</span>
                                 </div>
-                                <div className="w-[1px] h-10 bg-[#f0f2f4] dark:bg-gray-800"></div>
-                                <div className="flex flex-col">
-                                    <span className="text-xs text-[#617589] dark:text-gray-500 font-bold uppercase">Processing Time</span>
-                                    <span className="text-lg font-bold">1.2 Seconds</span>
+                                <div className="w-[1px] h-10 bg-[#E9E1DC]"></div>
+                                <div className="flex flex-col gap-1">
+                                    <span className="text-[11px] text-outline font-bold uppercase tracking-wider">Processing Time</span>
+                                    <span className="text-[16px] font-bold text-text-primary">1.2 Seconds</span>
                                 </div>
                             </div>
                         </div>
@@ -229,9 +216,9 @@ export default function CandidateAnalysis() {
 
                     {/* Left Column: Score Breakdown */}
                     <div className="lg:col-span-5 flex flex-col gap-6">
-                        <div className="bg-white dark:bg-[#111418] p-6 rounded-xl border border-[#f0f2f4] dark:border-gray-800 shadow-sm h-full">
-                            <h4 className="text-lg font-bold mb-6 flex items-center gap-2">
-                                <span className="material-symbols-outlined text-primary">analytics</span> Score Breakdown
+                        <div className="bg-white p-8 rounded-[24px] shadow-paper border border-[#E9E1DC] h-full">
+                            <h4 className="text-[18px] font-serif font-bold text-text-primary mb-8 flex items-center gap-3">
+                                <span className="material-symbols-outlined text-primary-sage">analytics</span> Score Breakdown
                             </h4>
                             <div className="space-y-6">
                                 <ScoreItem label="Technical Skills" score={techScore} />
@@ -239,11 +226,11 @@ export default function CandidateAnalysis() {
                                 <ScoreItem label="Education Alignment" score={eduScore} />
                                 <ScoreItem label="Cultural Fit Analysis" score={Math.round(candidate.final_score * 0.95 > 100 ? 100 : candidate.final_score * 0.95)} />
                             </div>
-                            <div className="mt-8 p-4 bg-primary/5 dark:bg-primary/10 rounded-lg border border-primary/10">
-                                <p className="text-xs text-primary font-bold uppercase mb-1 flex items-center gap-1">
-                                    <span className="material-symbols-outlined text-xs">info</span> AI Note
+                            <div className="mt-10 p-5 bg-[#F5ECE7] rounded-[16px]">
+                                <p className="text-[11px] text-text-primary font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                                    <span className="material-symbols-outlined text-[16px]">info</span> AI Note
                                 </p>
-                                <p className="text-sm text-[#617589] dark:text-gray-400">
+                                <p className="text-[13px] text-text-secondary leading-relaxed">
                                     Scoring is based on the comparison of the job description keywords and weighted industry standards for {roleTitle} roles.
                                 </p>
                             </div>
@@ -252,42 +239,42 @@ export default function CandidateAnalysis() {
 
                     {/* Right Column: Skills Analysis */}
                     <div className="lg:col-span-7 flex flex-col gap-6">
-                        <div className="bg-white dark:bg-[#111418] p-6 rounded-xl border border-[#f0f2f4] dark:border-gray-800 shadow-sm h-full flex flex-col">
-                            <h4 className="text-lg font-bold mb-6 flex items-center gap-2">
-                                <span className="material-symbols-outlined text-primary">checklist</span> Skills Analysis
+                        <div className="bg-white p-8 rounded-[24px] shadow-paper border border-[#E9E1DC] h-full flex flex-col">
+                            <h4 className="text-[18px] font-serif font-bold text-text-primary mb-8 flex items-center gap-3">
+                                <span className="material-symbols-outlined text-terracotta">checklist</span> Skills Analysis
                             </h4>
 
-                            <div className="mb-6">
-                                <p className="text-xs font-bold text-[#617589] dark:text-gray-500 uppercase tracking-widest mb-3">Matched Core Skills</p>
+                            <div className="mb-8">
+                                <p className="text-[11px] font-bold text-outline uppercase tracking-widest mb-4">Matched Core Skills</p>
                                 <div className="flex flex-wrap gap-2">
                                     {matchedSkills.length > 0 ? matchedSkills.map(skill => (
-                                        <span key={skill} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 text-sm font-semibold border border-green-100 dark:border-green-800">
+                                        <span key={skill} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#CAECBC]/20 text-primary-sage text-[13px] font-bold border border-[#CAECBC]">
                                             <span className="material-symbols-outlined text-[18px]">check_circle</span> {skill}
                                         </span>
-                                    )) : <span className="text-sm text-[#617589]">No direct skill matches found.</span>}
+                                    )) : <span className="text-[13px] text-outline">No direct skill matches found.</span>}
                                 </div>
                             </div>
 
                             <div className="mb-8 flex-1">
-                                <p className="text-xs font-bold text-[#617589] dark:text-gray-500 uppercase tracking-widest mb-3">Missing or Identified Gaps</p>
+                                <p className="text-[11px] font-bold text-outline uppercase tracking-widest mb-4">Missing or Identified Gaps</p>
                                 <div className="flex flex-wrap gap-2">
                                     {missingSkills.length > 0 ? missingSkills.map(skill => (
-                                        <span key={skill} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-400 text-sm font-semibold border border-orange-100 dark:border-orange-800">
+                                        <span key={skill} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-error/10 text-error text-[13px] font-bold border border-error/20">
                                             <span className="material-symbols-outlined text-[18px]">warning</span> {skill}
                                         </span>
-                                    )) : <span className="text-sm font-bold text-green-600 dark:text-green-500">No critical gaps detected.</span>}
+                                    )) : <span className="text-[13px] font-bold text-primary-sage">No critical gaps detected.</span>}
                                 </div>
                             </div>
 
                             {/* Skill Gap Recommendation */}
-                            <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 p-5 rounded-xl mt-auto">
+                            <div className="bg-[#F5ECE7]/80 p-6 rounded-[16px] mt-auto border border-[#E9E1DC]">
                                 <div className="flex items-start gap-4">
-                                    <div className="bg-amber-100 dark:bg-amber-900/40 p-2 rounded-lg text-amber-700 dark:text-amber-400 flex-shrink-0">
-                                        <span className="material-symbols-outlined">lightbulb</span>
+                                    <div className="bg-white p-2.5 rounded-xl text-terracotta flex-shrink-0 shadow-sm border border-[#E9E1DC]">
+                                        <span className="material-symbols-outlined text-[20px]">lightbulb</span>
                                     </div>
                                     <div>
-                                        <h5 className="text-amber-900 dark:text-amber-400 font-bold mb-1">Assessment Recommendation</h5>
-                                        <p className="text-amber-800 dark:text-amber-500 text-sm leading-relaxed">
+                                        <h5 className="text-text-primary font-bold text-[14px] mb-1.5">Assessment Recommendation</h5>
+                                        <p className="text-text-secondary text-[13px] leading-relaxed">
                                             {missingSkills.length > 0
                                                 ? `Candidate is missing "${missingSkills[0]}" from their profile. Incorporate this heavily into the initial technical screening.`
                                                 : "Candidate demonstrates strong core competencies across all requested requirements."}
@@ -300,20 +287,19 @@ export default function CandidateAnalysis() {
 
                     {/* Ethical AI Footer */}
                     <div className="lg:col-span-12 print:hidden">
-                        <div className="bg-white dark:bg-[#111418] border border-[#f0f2f4] dark:border-gray-800 rounded-xl p-6 shadow-sm overflow-hidden relative">
-                            <div className="absolute right-0 top-0 h-full w-1/3 bg-gradient-to-l from-primary/10 to-transparent pointer-events-none"></div>
-                            <div className="flex flex-col md:flex-row items-center gap-6 relative z-10">
-                                <div className="size-14 flex items-center justify-center bg-primary rounded-full text-white flex-shrink-0">
-                                    <span className="material-symbols-outlined text-3xl">policy</span>
+                        <div className="bg-white border border-[#E9E1DC] rounded-[24px] p-8 shadow-paper overflow-hidden relative">
+                            <div className="flex flex-col md:flex-row items-center gap-8 relative z-10">
+                                <div className="size-16 flex items-center justify-center bg-[#F5ECE7] rounded-full text-text-primary flex-shrink-0 border border-[#E9E1DC]">
+                                    <span className="material-symbols-outlined text-[28px]">policy</span>
                                 </div>
                                 <div className="flex-1 text-center md:text-left">
-                                    <h4 className="text-lg font-bold text-[#111418] dark:text-white mb-1">Ethical AI & Bias-Free Processing</h4>
-                                    <p className="text-[#617589] dark:text-gray-400 text-sm leading-relaxed max-w-4xl">
-                                        RecruitAI is committed to fair hiring. This analysis was generated by a model that has been audited for bias. To ensure objectivity, demographic identifiers such as gender, age, and race were automatically redacted from the data before the analysis was performed. Our algorithms focus purely on skills, work history, and achievement metrics.
+                                    <h4 className="text-[16px] font-bold text-text-primary mb-2">Ethical AI & Bias-Free Processing</h4>
+                                    <p className="text-text-secondary text-[14px] leading-relaxed max-w-4xl">
+                                        RecruitAI is committed to fair hiring. This analysis was generated by an objective model. To ensure fairness, demographic identifiers are automatically redacted from the data before the analysis.
                                     </p>
                                 </div>
                                 <div className="flex-shrink-0">
-                                    <button onClick={() => setShowAuditModal(true)} className="px-4 py-2 text-primary border border-primary/20 bg-primary/5 hover:bg-primary/10 rounded-lg text-sm font-bold transition-all">
+                                    <button onClick={() => setShowAuditModal(true)} className="px-6 py-3 text-text-primary border border-[#E9E1DC] bg-page hover:bg-[#F5ECE7] rounded-full text-[13px] font-bold transition-all shadow-sm">
                                         View Audit Log
                                     </button>
                                 </div>
@@ -325,100 +311,40 @@ export default function CandidateAnalysis() {
 
             {/* SCHEDULE MODAL */}
             {showScheduleModal && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#111418]/80 backdrop-blur-sm print:hidden px-4" onClick={(e) => e.target === e.currentTarget && setShowScheduleModal(false)}>
-                    <div className="bg-white dark:bg-[#111418] rounded-2xl shadow-xl border border-[#f0f2f4] dark:border-gray-800 w-full max-w-md overflow-hidden animate-fade-in-up md:m-0 m-4">
-                        <div className="p-6 border-b border-[#f0f2f4] dark:border-gray-800 flex justify-between items-center bg-[#f9fafb] dark:bg-[#111418]">
-                            <h3 className="font-bold text-[#111418] dark:text-white text-xl flex items-center gap-3">
-                                <div className="p-2 bg-primary/10 text-primary rounded-lg"><span className="material-symbols-outlined text-lg">calendar_month</span></div>
-                                Book Interview
-                            </h3>
-                            <button onClick={() => setShowScheduleModal(false)} className="p-2 hover:bg-[#f0f2f4] dark:hover:bg-gray-800 rounded-lg transition-colors text-[#617589]"><span className="material-symbols-outlined text-lg">close</span></button>
-                        </div>
-                        <form onSubmit={handleScheduleSubmit} className="p-6 space-y-6">
-                            <div>
-                                <label className="block text-[10px] font-bold text-[#617589] dark:text-gray-500 uppercase tracking-widest mb-2">Selected Candidate</label>
-                                <div className="bg-[#f9fafb] dark:bg-gray-900 border border-[#f0f2f4] dark:border-gray-800 rounded-xl p-3.5 text-sm font-bold text-[#111418] dark:text-white flex items-center gap-3">
-                                    <span className="material-symbols-outlined text-primary">person</span> {displayName}
-                                </div>
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-[10px] font-bold text-[#617589] dark:text-gray-500 uppercase tracking-widest mb-2">Target Date</label>
-                                    <input
-                                        type="date"
-                                        required
-                                        className="w-full bg-[#f9fafb] dark:bg-gray-900 border border-[#f0f2f4] dark:border-gray-800 rounded-lg p-3 text-sm text-[#111418] dark:text-white font-medium focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all [color-scheme:light] dark:[color-scheme:dark]"
-                                        min={new Date().toISOString().split('T')[0]}
-                                        value={scheduleData.date}
-                                        onChange={e => setScheduleData({ ...scheduleData, date: e.target.value })}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-[10px] font-bold text-[#617589] dark:text-gray-500 uppercase tracking-widest mb-2">Local Time</label>
-                                    <input
-                                        type="time"
-                                        required
-                                        className="w-full bg-[#f9fafb] dark:bg-gray-900 border border-[#f0f2f4] dark:border-gray-800 rounded-lg p-3 text-sm text-[#111418] dark:text-white font-medium focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all [color-scheme:light] dark:[color-scheme:dark]"
-                                        value={scheduleData.time}
-                                        onChange={e => setScheduleData({ ...scheduleData, time: e.target.value })}
-                                    />
-                                </div>
-                            </div>
-                            <div>
-                                <label className="block text-[10px] font-bold text-[#617589] dark:text-gray-500 uppercase tracking-widest mb-2">Meeting Format</label>
-                                <div className="flex gap-3 bg-[#f9fafb] dark:bg-gray-900 p-1.5 rounded-lg border border-[#f0f2f4] dark:border-gray-800">
-                                    <button
-                                        type="button"
-                                        onClick={() => setScheduleData({ ...scheduleData, type: 'video' })}
-                                        className={`flex-1 py-2 text-sm font-bold rounded-md transition-all flex items-center justify-center gap-2 ${scheduleData.type === 'video' ? 'bg-primary text-white shadow-sm' : 'text-[#617589] hover:text-[#111418] dark:hover:text-white'}`}
-                                    >
-                                        <span className="material-symbols-outlined text-[18px]">videocam</span> Video
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => setScheduleData({ ...scheduleData, type: 'phone' })}
-                                        className={`flex-1 py-2 text-sm font-bold rounded-md transition-all flex items-center justify-center gap-2 ${scheduleData.type === 'phone' ? 'bg-primary text-white shadow-sm' : 'text-[#617589] hover:text-[#111418] dark:hover:text-white'}`}
-                                    >
-                                        <span className="material-symbols-outlined text-[18px]">call</span> Phone
-                                    </button>
-                                </div>
-                            </div>
-                            <div className="pt-4">
-                                <button type="submit" className="w-full bg-primary text-white font-bold py-3.5 rounded-xl hover:bg-primary/90 transition-all shadow-md tracking-wide">
-                                    Confirm Booking
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+                <InterviewModal
+                    candidate={candidate}
+                    jobId={jobId}
+                    onClose={() => setShowScheduleModal(false)}
+                    onSuccess={handleScheduleSuccess}
+                />
             )}
 
             {/* AUDIT MODAL */}
             {showAuditModal && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#111418]/80 backdrop-blur-sm print:hidden px-4" onClick={(e) => e.target === e.currentTarget && setShowAuditModal(false)}>
-                    <div className="bg-white dark:bg-[#111418] rounded-2xl shadow-xl border border-[#f0f2f4] dark:border-gray-800 w-full max-w-xl overflow-hidden animate-fade-in-up md:m-0 m-4">
-                        <div className="p-6 border-b border-[#f0f2f4] dark:border-gray-800 flex justify-between items-center bg-[#f9fafb] dark:bg-[#111418]">
-                            <h3 className="font-bold text-[#111418] dark:text-white text-xl flex items-center gap-3">
-                                <div className="p-2 bg-primary/10 text-primary rounded-lg"><span className="material-symbols-outlined text-lg">receipt_long</span></div> 
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm print:hidden px-4" onClick={(e) => e.target === e.currentTarget && setShowAuditModal(false)}>
+                    <div className="bg-white rounded-[24px] shadow-paper w-full max-w-xl overflow-hidden animate-fade-in-up md:m-0 m-4">
+                        <div className="p-6 border-b border-[#E9E1DC] flex justify-between items-center bg-[#FBF9F4]">
+                            <h3 className="font-serif font-bold text-text-primary text-[20px] flex items-center gap-3">
+                                <div className="p-2.5 bg-terracotta/10 text-terracotta rounded-xl"><span className="material-symbols-outlined text-[20px]">receipt_long</span></div> 
                                 Traceability Logs
                             </h3>
-                            <button onClick={() => setShowAuditModal(false)} className="p-2 hover:bg-[#f0f2f4] dark:hover:bg-gray-800 rounded-lg transition-colors text-[#617589]"><span className="material-symbols-outlined text-lg">close</span></button>
+                            <button onClick={() => setShowAuditModal(false)} className="p-2 hover:bg-[#F5ECE7] rounded-full transition-colors text-outline"><span className="material-symbols-outlined text-[20px]">close</span></button>
                         </div>
                         <div className="p-8 max-h-[60vh] overflow-y-auto styled-scrollbar">
-                            <div className="relative border-l-2 border-[#f0f2f4] dark:border-gray-800 pl-8 space-y-10 ml-3">
+                            <div className="relative border-l-2 border-[#E9E1DC] pl-10 space-y-10 ml-4">
                                 {[
                                     { title: "Dashboard Interaction", desc: `Candidate designated as ${candidate.status.toUpperCase()}`, time: "Just now", icon: "check_circle" },
-                                    { title: "Semantic Engine Proc", desc: "Data serialized. Transformers V2 encoded vector spaces.", time: "1 day ago", icon: "memory" },
+                                    { title: "Semantic Engine Proc", desc: "Data serialized. Vector spaces mapped.", time: "1 day ago", icon: "memory" },
                                     { title: "Compliance Pass", desc: "Names, demographics strictly dropped from processing.", time: "1 day ago", icon: "security" },
                                     { title: "Ingestion Queue", desc: "Payload successfully routed through file boundary checks.", time: "1 day ago", icon: "move_to_inbox" },
                                 ].map((log, i) => (
                                     <div key={i} className="relative">
-                                        <span className="absolute -left-[45px] top-0 w-10 h-10 rounded-full bg-white dark:bg-[#111418] border border-primary/50 flex items-center justify-center text-primary shadow-sm">
+                                        <span className="absolute -left-[58px] top-0 size-10 rounded-full bg-white border border-[#CAECBC] flex items-center justify-center text-primary-sage shadow-sm">
                                             <span className="material-symbols-outlined text-[20px]">{log.icon}</span>
                                         </span>
-                                        <p className="text-[10px] font-bold text-[#617589] uppercase mb-1 tracking-widest">{log.time}</p>
-                                        <h4 className="font-bold text-[#111418] dark:text-white text-sm mb-1">{log.title}</h4>
-                                        <p className="text-sm text-[#617589] font-medium">{log.desc}</p>
+                                        <p className="text-[11px] font-bold text-outline uppercase mb-1 tracking-widest">{log.time}</p>
+                                        <h4 className="font-bold text-text-primary text-[14px] mb-1">{log.title}</h4>
+                                        <p className="text-[13px] text-text-secondary leading-relaxed">{log.desc}</p>
                                     </div>
                                 ))}
                             </div>
@@ -432,13 +358,13 @@ export default function CandidateAnalysis() {
 
 function ScoreItem({ label, score }) {
     return (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-3">
             <div className="flex justify-between items-end">
-                <span className="text-sm font-bold text-[#111418] dark:text-white uppercase tracking-tight">{label}</span>
-                <span className="text-sm font-black text-primary">{score}%</span>
+                <span className="text-[13px] font-bold text-text-primary uppercase tracking-wider">{label}</span>
+                <span className="text-[15px] font-black text-primary-sage">{score}%</span>
             </div>
-            <div className="w-full bg-[#f0f2f4] dark:bg-gray-800 rounded-full h-2.5">
-                <div className="bg-primary h-2.5 rounded-full transition-all duration-1000 ease-out" style={{ width: `${score}%` }}></div>
+            <div className="w-full bg-[#F5ECE7] rounded-full h-3">
+                <div className="bg-primary-sage h-3 rounded-full transition-all duration-1000 ease-out" style={{ width: `${score}%` }}></div>
             </div>
         </div>
     );

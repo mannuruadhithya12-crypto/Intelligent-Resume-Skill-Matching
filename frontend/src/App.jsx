@@ -21,7 +21,7 @@ import HistoryPage from "./pages/HistoryPage";
 const ProtectedRoute = ({ children }) => {
   const { token, loading } = useAuth();
 
-  if (loading) return <div className="min-h-screen bg-[#0B0E14] flex items-center justify-center text-white">Loading...</div>;
+    if (loading) return <div className="min-h-screen bg-page flex items-center justify-center text-text-primary font-sans font-medium">Loading workspace...</div>;
 
   if (!token) {
     return <Navigate to="/login" replace />;
@@ -30,17 +30,18 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
-// Main App Layout
 const Layout = () => {
   return (
-    <div className="bg-[#050B14] text-slate-200 font-display min-h-screen flex h-screen overflow-hidden">
+    <div className="bg-page text-text-primary font-sans min-h-screen flex h-screen overflow-hidden">
       <Sidebar />
-      <main className="flex-1 flex flex-col overflow-y-auto bg-[#050B14] relative">
+      <main className="flex-1 flex flex-col h-screen overflow-hidden bg-page relative">
         <TopNavbar />
-        <div className="p-8 max-w-7xl mx-auto w-full flex-1">
-          <Outlet />
+        <div className="flex-1 overflow-y-auto relative z-10" id="main-scroll-container">
+          <div className="px-10 py-8 max-w-[1440px] mx-auto w-full min-h-full flex flex-col">
+            <Outlet />
+          </div>
+          <Footer />
         </div>
-        <Footer />
       </main>
     </div>
   );

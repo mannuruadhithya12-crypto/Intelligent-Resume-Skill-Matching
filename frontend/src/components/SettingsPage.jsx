@@ -20,24 +20,20 @@ export default function SettingsPage() {
     };
 
     return (
-        <div onClick={handleBackgroundClick} className="flex flex-col h-full cursor-default -m-8 p-8 transition-colors bg-[#050B14]">
-            <div className="mb-6 flex items-center justify-between max-w-6xl mx-auto w-full animate-fade-in">
-                <button onClick={handleBack} className="flex items-center gap-2 text-gray-400 hover:text-white font-bold transition-colors px-4 py-2 rounded-xl hover:bg-[#0f172a] border border-transparent hover:border-gray-800">
+        <div className="flex flex-col flex-1 font-sans">
+            <div className="mb-6 flex items-center justify-between w-full animate-fade-in">
+                <button onClick={handleBack} className="flex items-center gap-2 text-text-secondary hover:text-text-primary font-bold transition-colors px-4 py-2 rounded-xl hover:bg-[#F5ECE7] border border-transparent hover:border-[#E9E1DC]">
                     <FiArrowLeft size={20} /> Back to Dashboard
-                </button>
-                <button onClick={handleBack} className="p-2 text-gray-500 hover:text-white rounded-xl hover:bg-[#0f172a] transition-colors border border-transparent hover:border-gray-800">
-                    <FiX size={24} />
                 </button>
             </div>
 
-            <div className="bg-[#0f172a] rounded-3xl border border-gray-800 shadow-card flex overflow-hidden min-h-[700px] flex-1 max-w-6xl mx-auto w-full animate-scale-in transition-colors relative">
-
-                {/* Subtle top gradient bar */}
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-600 via-primary to-purple-600 opacity-80"></div>
+            <div className="bg-white rounded-[24px] border border-[#E9E1DC] shadow-paper flex flex-col md:flex-row min-h-[700px] w-full animate-scale-in relative overflow-hidden">
+                {/* Subtle top indicator bar */}
+                <div className="absolute top-0 left-0 w-full h-1 bg-primary-sage opacity-80 z-20"></div>
 
                 {/* Settings Sidebar */}
-                <div className="w-72 bg-[#050B14] border-r border-gray-800 p-8 flex flex-col gap-2 transition-colors relative z-10">
-                    <h2 className="text-2xl font-display font-black text-white mb-8 tracking-tight px-2">Preferences</h2>
+                <div className="w-full md:w-72 bg-[#F4F1EA] border-b md:border-b-0 md:border-r border-[#E9E1DC] p-8 flex flex-col gap-2 relative z-10 shrink-0">
+                    <h2 className="text-2xl font-serif font-black text-text-primary mb-8 tracking-tight px-2">Preferences</h2>
                     <SidebarItem
                         icon={<FiUser size={18} />} label="Professional Profile" active={activeTab === 'profile'}
                         onClick={() => setActiveTab('profile')}
@@ -57,7 +53,7 @@ export default function SettingsPage() {
                 </div>
 
                 {/* Content Area */}
-                <div className="flex-1 p-10 lg:p-12 overflow-y-auto bg-[#0f172a] relative z-10 styled-scrollbar">
+                <div className="flex-1 p-8 lg:p-12 bg-white relative z-10">
                     {activeTab === 'profile' && <ProfileSettings user={user} updateUser={updateUser} />}
                     {activeTab === 'notifications' && <NotificationSettings />}
                     {activeTab === 'security' && <SecuritySettings />}
@@ -72,12 +68,12 @@ function SidebarItem({ icon, label, active, onClick }) {
     return (
         <button
             onClick={onClick}
-            className={`flex items-center gap-3 px-5 py-3.5 rounded-xl text-sm font-bold transition-all text-left w-full border ${active
-                ? 'bg-[#0f172a] text-primary border-gray-800 shadow-sm'
-                : 'border-transparent text-gray-500 hover:bg-[#0f172a]/50 hover:text-gray-300'
+            className={`flex items-center gap-3 px-5 py-3.5 rounded-xl text-[14px] font-bold transition-all text-left w-full border ${active
+                ? 'bg-white text-primary-sage border-[#E9E1DC] shadow-sm'
+                : 'border-transparent text-text-secondary hover:bg-[#E9E1DC]/50 hover:text-text-primary'
                 }`}
         >
-            <div className={`${active ? 'text-primary-glow' : 'text-gray-500'}`}>{icon}</div>
+            <div className={`${active ? 'text-primary-sage' : 'text-text-secondary'}`}>{icon}</div>
             {label}
         </button>
     );
@@ -127,7 +123,6 @@ function ProfileSettings({ user, updateUser }) {
                 avatar: formData.avatar
             });
         }
-        // Simulated network delay for professional feel if updateUser is fast/mocked
         await new Promise(r => setTimeout(r, 600));
         setLoading(false);
         setSuccess(true);
@@ -136,11 +131,11 @@ function ProfileSettings({ user, updateUser }) {
 
     return (
         <div className="max-w-2xl animate-fade-in-up">
-            <h3 className="text-3xl font-display font-black text-white mb-2 tracking-tight">Professional Profile</h3>
-            <p className="text-gray-400 mb-10 text-sm">Manage your enterprise identity and corporate contact details.</p>
+            <h3 className="text-3xl font-serif font-black text-text-primary mb-2 tracking-tight">Professional Profile</h3>
+            <p className="text-text-secondary mb-10 text-[15px]">Manage your enterprise identity and corporate contact details.</p>
 
-            <div className="flex items-center gap-8 mb-10 bg-[#050B14] p-6 rounded-2xl border border-gray-800 shadow-inner">
-                <div className="w-24 h-24 rounded-2xl bg-[#0f172a] border border-gray-700 overflow-hidden shadow-sm relative group">
+            <div className="flex items-center gap-8 mb-10 bg-[#FBF9F4] p-6 rounded-2xl border border-[#E9E1DC]">
+                <div className="w-24 h-24 rounded-2xl bg-white border border-[#E9E1DC] overflow-hidden shadow-sm relative group">
                     <img
                         src={formData.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${formData.name}`}
                         alt="Avatar"
@@ -148,46 +143,46 @@ function ProfileSettings({ user, updateUser }) {
                     />
                 </div>
                 <div>
-                    <label className="px-5 py-2.5 bg-[#0f172a] border border-gray-700 rounded-xl text-gray-300 font-bold hover:bg-gray-800 hover:text-white transition-all cursor-pointer inline-block shadow-sm">
+                    <label className="px-5 py-2.5 bg-white border border-[#E9E1DC] rounded-full text-text-primary font-bold hover:bg-[#F5ECE7] hover:border-outline-variant transition-all cursor-pointer inline-block shadow-sm text-[13px]">
                         Upload New Photo
                         <input type="file" className="hidden" accept="image/*" onChange={handleFileChange} />
                     </label>
-                    <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-3 flex items-center gap-1.5"><FiGlobe /> Supported formats: JPG, PNG (Max 1MB)</p>
+                    <p className="text-[11px] font-bold text-outline uppercase tracking-widest mt-3 flex items-center gap-1.5"><FiGlobe /> Supported formats: JPG, PNG (Max 1MB)</p>
                 </div>
             </div>
 
             <div className="space-y-6">
                 <div className="grid grid-cols-2 gap-6">
                     <div>
-                        <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">Legal/Full Name</label>
-                        <input name="name" value={formData.name} onChange={handleChange} className="w-full px-5 py-3.5 bg-[#050B14] border border-gray-800 rounded-xl focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all text-white font-medium" />
+                        <label className="block text-[11px] font-bold text-outline uppercase tracking-widest mb-2">Legal/Full Name</label>
+                        <input name="name" value={formData.name} onChange={handleChange} className="w-full px-5 py-3.5 bg-white border border-[#E9E1DC] rounded-xl focus:ring-1 focus:ring-primary-sage focus:border-primary-sage outline-none transition-all text-text-primary font-medium shadow-sm" />
                     </div>
                     <div>
-                        <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">Corporate Role</label>
-                        <input name="role" value={formData.role} onChange={handleChange} className="w-full px-5 py-3.5 bg-[#050B14] border border-gray-800 rounded-xl focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all text-white font-medium" />
+                        <label className="block text-[11px] font-bold text-outline uppercase tracking-widest mb-2">Corporate Role</label>
+                        <input name="role" value={formData.role} onChange={handleChange} className="w-full px-5 py-3.5 bg-white border border-[#E9E1DC] rounded-xl focus:ring-1 focus:ring-primary-sage focus:border-primary-sage outline-none transition-all text-text-primary font-medium shadow-sm" />
                     </div>
                 </div>
 
                 <div>
-                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">Enterprise Email Address</label>
-                    <input name="email" value={formData.email} onChange={handleChange} className="w-full px-5 py-3.5 bg-[#050B14] border border-gray-800 rounded-xl focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all text-gray-400 font-medium cursor-not-allowed" disabled />
-                    <p className="text-xs text-gray-600 mt-2 italic">Email cannot be modified without IT administrator approval.</p>
+                    <label className="block text-[11px] font-bold text-outline uppercase tracking-widest mb-2">Enterprise Email Address</label>
+                    <input name="email" value={formData.email} onChange={handleChange} className="w-full px-5 py-3.5 bg-[#F5ECE7] border border-[#E9E1DC] rounded-xl focus:outline-none transition-all text-text-secondary font-medium cursor-not-allowed shadow-sm" disabled />
+                    <p className="text-xs text-text-secondary mt-2 italic">Email cannot be modified without IT administrator approval.</p>
                 </div>
 
                 <div>
-                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">Office Location</label>
-                    <input name="location" value={formData.location} onChange={handleChange} className="w-full px-5 py-3.5 bg-[#050B14] border border-gray-800 rounded-xl focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all text-white font-medium" />
+                    <label className="block text-[11px] font-bold text-outline uppercase tracking-widest mb-2">Office Location</label>
+                    <input name="location" value={formData.location} onChange={handleChange} className="w-full px-5 py-3.5 bg-white border border-[#E9E1DC] rounded-xl focus:ring-1 focus:ring-primary-sage focus:border-primary-sage outline-none transition-all text-text-primary font-medium shadow-sm" />
                 </div>
 
-                <div className="pt-8 flex items-center gap-4 border-t border-gray-800">
+                <div className="pt-8 flex items-center gap-4 border-t border-[#E9E1DC]">
                     <button
                         onClick={handleSave}
                         disabled={loading}
-                        className="px-8 py-3.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold rounded-xl hover:scale-[1.02] transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(37,99,235,0.4)] disabled:opacity-50 disabled:hover:scale-100"
+                        className="px-8 py-3.5 bg-primary-sage text-white font-bold rounded-full hover:bg-primary-sage/90 transition-all flex items-center gap-2 shadow-sm disabled:opacity-50"
                     >
-                        {loading ? <span className="flex items-center gap-2"><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Syncing...</span> : <><FiSave /> Save Identity Configuration</>}
+                        {loading ? <span className="flex items-center gap-2"><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Syncing...</span> : <><FiSave /> Save Profile</>}
                     </button>
-                    {success && <span className="text-emerald-400 font-bold flex items-center gap-2 animate-fade-in bg-emerald-500/10 px-4 py-2 rounded-lg border border-emerald-500/20"><FiCheck /> Profile Synchronized</span>}
+                    {success && <span className="text-primary-sage font-bold flex items-center gap-2 animate-fade-in bg-[#CAECBC]/30 px-4 py-2 rounded-xl border border-[#CAECBC]"><FiCheck /> Profile Synchronized</span>}
                 </div>
             </div>
         </div>
@@ -196,6 +191,7 @@ function ProfileSettings({ user, updateUser }) {
 
 function NotificationSettings() {
     const [toggles, setToggles] = useState({ email: true, push: true, weekly: false });
+    const [errorMsg, setErrorMsg] = useState(null);
 
     useEffect(() => {
         getSettings().then(s => {
@@ -204,21 +200,32 @@ function NotificationSettings() {
     }, []);
 
     const toggle = async (k) => {
+        const oldState = { ...toggles };
         const newState = { ...toggles, [k]: !toggles[k] };
         setToggles(newState);
-        // Persist
+        setErrorMsg(null);
         try {
             const current = await getSettings();
             await updateSettings({ ...current, notifications: newState });
         } catch (e) {
             console.error("Failed to sync toggles", e);
+            setToggles(oldState); // Revert on failure
+            setErrorMsg("Failed to save preference. Connection error.");
+            setTimeout(() => setErrorMsg(null), 4000);
         }
     };
 
     return (
         <div className="max-w-2xl animate-fade-in-up">
-            <h3 className="text-3xl font-display font-black text-white mb-2 tracking-tight">Alerts & Digests</h3>
-            <p className="text-gray-400 mb-10 text-sm">Configure how RecruitAI communicates important hiring events.</p>
+            <h3 className="text-3xl font-serif font-black text-text-primary mb-2 tracking-tight">Alerts & Digests</h3>
+            <p className="text-text-secondary mb-6 text-[15px]">Configure how RecruitAI communicates important hiring events.</p>
+
+            {errorMsg && (
+                <div className="mb-6 p-4 rounded-xl text-sm font-bold border flex items-center gap-3 bg-[#FFEBEE] text-[#C62828] border-[#FFCDD2] animate-fade-in">
+                    <div className="p-1 bg-[#C62828]/20 rounded-md"><FiX size={16} /></div>
+                    {errorMsg}
+                </div>
+            )}
 
             <div className="space-y-4">
                 <ToggleRow
@@ -260,7 +267,7 @@ function SecuritySettings() {
 
     const handleUpdate = async () => {
         if (!passData.current || !passData.new) {
-            setMsg({ type: 'error', text: "Please enter your cryptographic credentials." });
+            setMsg({ type: 'error', text: "Please enter your credentials." });
             return;
         }
         if (passData.new !== passData.confirm) {
@@ -271,7 +278,7 @@ function SecuritySettings() {
         setMsg({ type: '', text: '' });
         try {
             await changePassword(passData.current, passData.new);
-            setMsg({ type: 'success', text: 'Authentication token updated successfully in the vault.' });
+            setMsg({ type: 'success', text: 'Password updated successfully.' });
             setTimeout(() => {
                 setIsEditing(false);
                 setPassData({ current: '', new: '', confirm: '' });
@@ -279,7 +286,7 @@ function SecuritySettings() {
             }, 3000);
         } catch (e) {
             console.error(e);
-            setMsg({ type: 'error', text: e.response?.data?.detail || "Vault connection failed. Token rejected." });
+            setMsg({ type: 'error', text: e.response?.data?.detail || "Authentication failed." });
         } finally {
             setLoading(false);
         }
@@ -287,120 +294,119 @@ function SecuritySettings() {
 
     return (
         <div className="max-w-3xl animate-fade-in-up">
-            <h3 className="text-3xl font-display font-black text-white mb-2 tracking-tight">Access & Security</h3>
-            <p className="text-gray-400 mb-10 text-sm">Manage security protocols, passwords, and track system access.</p>
+            <h3 className="text-3xl font-serif font-black text-text-primary mb-2 tracking-tight">Access & Security</h3>
+            <p className="text-text-secondary mb-10 text-[15px]">Manage security protocols, passwords, and track system access.</p>
 
-            <div className="bg-amber-500/10 border border-amber-500/30 p-5 rounded-2xl flex gap-4 text-amber-500 mb-8 shadow-sm relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl -mt-10 -mr-10 pointer-events-none"></div>
-                <div className="p-2 bg-[#0f172a] rounded-xl self-start text-amber-500 border border-amber-500/20 shadow-inner">
+            <div className="bg-[#FFF4E5] border border-[#FFE0B2] p-5 rounded-2xl flex gap-4 text-[#E65100] mb-8 shadow-sm relative overflow-hidden">
+                <div className="p-2 bg-white rounded-xl self-start text-[#E65100] border border-[#FFE0B2] shadow-sm">
                     <FiShield size={20} />
                 </div>
                 <div className="relative z-10">
                     <p className="font-bold text-base mb-1 tracking-wide">Multi-Factor Authentication (MFA) Inactive</p>
-                    <p className="text-xs text-amber-500/80 font-medium">Your corporate policy highly recommends enabling MFA logic via Authenticator app. Please contact your administrator if you need a hardware key setup.</p>
+                    <p className="text-[13px] text-[#E65100]/80 font-medium">Your corporate policy highly recommends enabling MFA logic via Authenticator app. Please contact your administrator if you need a hardware key setup.</p>
                 </div>
             </div>
 
             {!isEditing ? (
-                <button onClick={() => setIsEditing(true)} className="px-6 py-3 bg-[#050B14] border border-gray-800 text-white font-bold rounded-xl hover:bg-gray-800 hover:border-gray-700 transition-all flex items-center gap-2 shadow-sm">
-                    <FiLock /> Update Cryptographic Password
+                <button onClick={() => setIsEditing(true)} className="px-6 py-3 bg-white border border-[#E9E1DC] text-text-primary font-bold rounded-full hover:bg-[#F5ECE7] transition-all flex items-center gap-2 shadow-sm text-[14px]">
+                    <FiLock /> Update Password
                 </button>
             ) : (
-                <div className="bg-[#050B14] p-8 rounded-2xl border border-gray-800 mb-8 animate-fade-in-up shadow-inner relative">
-                    <h4 className="font-bold text-white text-lg mb-6 tracking-wide">Change Security Token</h4>
+                <div className="bg-[#FBF9F4] p-8 rounded-2xl border border-[#E9E1DC] mb-8 animate-fade-in-up shadow-sm">
+                    <h4 className="font-bold text-text-primary text-lg mb-6 tracking-wide">Change Password</h4>
                     {msg.text && (
-                        <div className={`p-4 rounded-xl text-sm font-bold mb-6 border flex items-center gap-3 ${msg.type === 'error' ? 'bg-[#0f172a] text-red-400 border-red-500/30 shadow-[0_0_15px_rgba(239,68,68,0.1)]' : 'bg-[#0f172a] text-emerald-400 border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.1)]'}`}>
-                            {msg.type === 'error' ? <div className="p-1 bg-red-500/20 rounded-md"><FiX size={16} /></div> : <div className="p-1 bg-emerald-500/20 rounded-md"><FiCheck size={16} /></div>}
+                        <div className={`p-4 rounded-xl text-sm font-bold mb-6 border flex items-center gap-3 ${msg.type === 'error' ? 'bg-[#FFEBEE] text-[#C62828] border-[#FFCDD2]' : 'bg-[#E8F5E9] text-[#2E7D32] border-[#C8E6C9]'}`}>
+                            {msg.type === 'error' ? <div className="p-1 bg-[#C62828]/20 rounded-md"><FiX size={16} /></div> : <div className="p-1 bg-[#2E7D32]/20 rounded-md"><FiCheck size={16} /></div>}
                             {msg.text}
                         </div>
                     )}
                     <div className="space-y-6">
                         <div>
-                            <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-2">Current Token</label>
+                            <label className="text-[11px] font-bold text-outline uppercase tracking-widest block mb-2">Current Password</label>
                             <input type="password"
-                                className="w-full px-5 py-3.5 rounded-xl bg-[#0f172a] border border-gray-800 text-white outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all shadow-sm"
+                                className="w-full px-5 py-3.5 rounded-xl bg-white border border-[#E9E1DC] text-text-primary outline-none focus:ring-1 focus:ring-primary-sage focus:border-primary-sage transition-all shadow-sm"
                                 value={passData.current} onChange={e => setPassData({ ...passData, current: e.target.value })}
                             />
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-2">New Token Definition</label>
+                                <label className="text-[11px] font-bold text-outline uppercase tracking-widest block mb-2">New Password</label>
                                 <input type="password"
-                                    className="w-full px-5 py-3.5 rounded-xl bg-[#0f172a] border border-gray-800 text-white outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all shadow-sm"
+                                    className="w-full px-5 py-3.5 rounded-xl bg-white border border-[#E9E1DC] text-text-primary outline-none focus:ring-1 focus:ring-primary-sage focus:border-primary-sage transition-all shadow-sm"
                                     value={passData.new} onChange={e => setPassData({ ...passData, new: e.target.value })}
                                 />
                             </div>
                             <div>
-                                <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-2">Verify Token Definition</label>
+                                <label className="text-[11px] font-bold text-outline uppercase tracking-widest block mb-2">Verify Password</label>
                                 <input type="password"
-                                    className="w-full px-5 py-3.5 rounded-xl bg-[#0f172a] border border-gray-800 text-white outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all shadow-sm"
+                                    className="w-full px-5 py-3.5 rounded-xl bg-white border border-[#E9E1DC] text-text-primary outline-none focus:ring-1 focus:ring-primary-sage focus:border-primary-sage transition-all shadow-sm"
                                     value={passData.confirm} onChange={e => setPassData({ ...passData, confirm: e.target.value })}
                                 />
                             </div>
                         </div>
-                        <div className="flex gap-4 pt-4 border-t border-gray-800">
-                            <button onClick={handleUpdate} disabled={loading} className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold rounded-xl hover:scale-[1.02] transition shadow-[0_0_15px_rgba(37,99,235,0.4)] disabled:opacity-50">
+                        <div className="flex gap-4 pt-4 border-t border-[#E9E1DC]">
+                            <button onClick={handleUpdate} disabled={loading} className="px-6 py-3 bg-primary-sage text-white font-bold rounded-full hover:bg-primary-sage/90 transition shadow-sm disabled:opacity-50 text-[14px]">
                                 {loading ? 'Transmitting...' : 'Apply Token Update'}
                             </button>
-                            <button onClick={() => setIsEditing(false)} className="px-6 py-3 text-gray-400 hover:text-white hover:bg-gray-800 font-bold rounded-xl transition">Revert</button>
+                            <button onClick={() => setIsEditing(false)} className="px-6 py-3 text-text-secondary hover:text-text-primary hover:bg-[#F5ECE7] font-bold rounded-full transition text-[14px]">Revert</button>
                         </div>
                     </div>
                 </div>
             )}
 
-            <div className="mt-12 pt-10 border-t border-gray-800">
+            <div className="mt-12 pt-10 border-t border-[#E9E1DC]">
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
                     <div>
-                        <h4 className="text-xl font-bold text-white flex items-center gap-3 tracking-wide">
-                            <div className="p-2 bg-[#050B14] border border-gray-800 rounded-lg text-primary shadow-inner"><FiMonitor size={18} /></div>
+                        <h4 className="text-xl font-bold text-text-primary flex items-center gap-3 tracking-wide">
+                            <div className="p-2 bg-white border border-[#E9E1DC] rounded-lg text-primary-sage shadow-sm"><FiMonitor size={18} /></div>
                             Access Telemetry
                         </h4>
-                        <p className="text-sm text-gray-500 mt-2">Historical audit logs of interface and API access handshakes.</p>
+                        <p className="text-[14px] text-text-secondary mt-2">Historical audit logs of interface and API access handshakes.</p>
                     </div>
                     <button
                         onClick={() => setShowActivity(!showActivity)}
-                        className="px-6 py-3 border border-gray-800 bg-[#050B14] rounded-xl text-sm font-bold shadow-sm hover:bg-gray-800 transition-colors text-white flex items-center gap-2"
+                        className="px-6 py-3 border border-[#E9E1DC] bg-white rounded-full text-[13px] font-bold shadow-sm hover:bg-[#F5ECE7] transition-colors text-text-primary flex items-center gap-2"
                     >
-                        {showActivity ? 'Collapse Telemetry' : (<><FiActivity className="text-primary-glow" /> Execute Query</>)}
+                        {showActivity ? 'Collapse Telemetry' : (<><FiActivity className="text-primary-sage" /> View History</>)}
                     </button>
                 </div>
 
                 {showActivity && (
-                    <div className="bg-[#050B14] border border-gray-800 rounded-2xl overflow-hidden animate-fade-in-up shadow-inner">
+                    <div className="bg-white border border-[#E9E1DC] rounded-2xl overflow-hidden animate-fade-in-up shadow-sm">
                         <div className="overflow-x-auto">
-                            <table className="w-full text-sm text-left">
-                                <thead className="bg-[#0f172a] text-[10px] uppercase font-bold tracking-widest text-gray-500 border-b border-gray-800">
+                            <table className="w-full text-[13px] text-left">
+                                <thead className="bg-[#FBF9F4] text-[10px] uppercase font-bold tracking-widest text-outline border-b border-[#E9E1DC]">
                                     <tr>
-                                        <th className="px-6 py-4 whitespace-nowrap">Origin Device & IP Frame</th>
-                                        <th className="px-6 py-4 whitespace-nowrap">Approximate Node Location</th>
-                                        <th className="px-6 py-4 whitespace-nowrap">Timestamp (Local)</th>
-                                        <th className="px-6 py-4 text-right whitespace-nowrap">Handshake Result</th>
+                                        <th className="px-6 py-4 whitespace-nowrap">Origin Device & IP</th>
+                                        <th className="px-6 py-4 whitespace-nowrap">Location</th>
+                                        <th className="px-6 py-4 whitespace-nowrap">Timestamp</th>
+                                        <th className="px-6 py-4 text-right whitespace-nowrap">Result</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-gray-800/50">
+                                <tbody className="divide-y divide-[#E9E1DC]">
                                     {activityData.length > 0 ? activityData.map((a, i) => (
-                                        <tr key={i} className="hover:bg-[#0f172a] transition-colors">
-                                            <td className="px-6 py-4 font-bold text-white">
+                                        <tr key={i} className="hover:bg-[#FBF9F4] transition-colors">
+                                            <td className="px-6 py-4 font-bold text-text-primary">
                                                 <div className="flex flex-col gap-0.5">
-                                                    <span className="text-sm">{a.user_agent ? (a.user_agent.includes('Chrome') ? 'Google Chrome (V8)' : a.user_agent.includes('Firefox') ? 'Mozilla Firefox' : a.user_agent.includes('Safari') ? 'Apple Safari' : 'Unknown Agent') : 'Unidentified Origin'}</span>
-                                                    <span className="text-[10px] font-mono text-gray-500 font-bold bg-gray-900/50 inline-flex px-1.5 py-0.5 rounded max-w-max">{a.ip_address}</span>
+                                                    <span className="text-[13px]">{a.user_agent ? (a.user_agent.includes('Chrome') ? 'Google Chrome' : a.user_agent.includes('Firefox') ? 'Mozilla Firefox' : a.user_agent.includes('Safari') ? 'Apple Safari' : 'Unknown Agent') : 'Unidentified Origin'}</span>
+                                                    <span className="text-[11px] font-mono text-text-secondary font-bold bg-[#F5ECE7] inline-flex px-1.5 py-0.5 rounded max-w-max">{a.ip_address}</span>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 text-gray-400 font-medium">
+                                            <td className="px-6 py-4 text-text-secondary font-medium">
                                                 <div className="flex items-center gap-2">
-                                                    <FiGlobe size={14} className="text-gray-600" /> {a.location || 'Encrypted / Unknown node'}
+                                                    <FiGlobe size={14} className="text-outline" /> {a.location || 'Encrypted / Unknown node'}
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 text-gray-300 font-mono text-xs">
+                                            <td className="px-6 py-4 text-text-secondary font-mono text-xs">
                                                 {new Date(a.timestamp).toLocaleString()}
                                             </td>
                                             <td className="px-6 py-4 text-right">
                                                 {i === 0 ? (
-                                                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 text-xs font-bold border border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.1)]">
-                                                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Authorized (Active)
+                                                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#CAECBC]/30 text-primary-sage text-[11px] font-bold border border-[#CAECBC]">
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-primary-sage animate-pulse"></span> Authorized (Active)
                                                     </span>
                                                 ) : (
-                                                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-800/50 text-gray-400 text-xs font-bold border border-gray-700">
+                                                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#F5ECE7] text-text-secondary text-[11px] font-bold border border-[#E9E1DC]">
                                                         {a.status === 'success' ? 'Session Terminated' : 'Handshake Failed'}
                                                     </span>
                                                 )}
@@ -408,7 +414,7 @@ function SecuritySettings() {
                                         </tr>
                                     )) : (
                                         <tr>
-                                            <td colSpan="4" className="px-6 py-10 text-center text-gray-500 font-medium">No telemetry payload available for this query.</td>
+                                            <td colSpan="4" className="px-6 py-10 text-center text-text-secondary font-medium">No telemetry payload available for this query.</td>
                                         </tr>
                                     )}
                                 </tbody>
@@ -424,20 +430,20 @@ function SecuritySettings() {
 function AppearanceSettings({ theme }) {
     return (
         <div className="max-w-2xl animate-fade-in-up">
-            <h3 className="text-3xl font-display font-black text-white mb-2 tracking-tight">Workspace UI</h3>
-            <p className="text-gray-400 mb-10 text-sm">Theme constraints and accessibility preferences.</p>
+            <h3 className="text-3xl font-serif font-black text-text-primary mb-2 tracking-tight">Workspace UI</h3>
+            <p className="text-text-secondary mb-10 text-[15px]">Theme constraints and accessibility preferences.</p>
 
-            <div className="bg-[#050B14] border border-gray-800 p-8 rounded-2xl shadow-inner">
-                <div className="flex items-center gap-4 mb-6 text-primary">
-                    <FiMonitor size={24} className="text-primary-glow" />
-                    <h4 className="font-bold text-white text-lg tracking-wide">Interface Mode Locked</h4>
+            <div className="bg-[#FBF9F4] border border-[#E9E1DC] p-8 rounded-2xl shadow-sm">
+                <div className="flex items-center gap-4 mb-6 text-primary-sage">
+                    <FiMonitor size={24} className="text-primary-sage" />
+                    <h4 className="font-bold text-text-primary text-lg tracking-wide">Interface Mode Locked</h4>
                 </div>
-                <p className="text-sm text-gray-400 leading-relaxed mb-6 font-medium">
-                    The RecruitAI Enterprise interface is currently constrained to <strong className="text-white">Dark Theme (Deep Space #050B14)</strong> by default to support complex continuous data visualization workflows and minimize eye strain for recruiters operating high-density analytics dashboards.
+                <p className="text-[14px] text-text-secondary leading-relaxed mb-6 font-medium">
+                    The RecruitAI Enterprise interface is currently constrained to <strong className="text-text-primary">Warm Light Theme (Oatmeal #FBF9F4)</strong> by default to support complex continuous data visualization workflows and provide a natural, paper-like reading experience for recruiters operating high-density analytics dashboards.
                 </p>
                 <div className="flex gap-4">
-                    <div className="px-6 py-3 border-2 border-primary bg-primary/10 text-primary-glow rounded-xl font-bold flex items-center gap-2 shadow-neon cursor-default">
-                        <div className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse"></div> Active Theme
+                    <div className="px-6 py-3 border border-primary-sage bg-[#CAECBC]/20 text-primary-sage rounded-full font-bold flex items-center gap-2 shadow-sm cursor-default text-[13px]">
+                        <div className="w-2 h-2 rounded-full bg-primary-sage animate-pulse"></div> Active Theme
                     </div>
                 </div>
             </div>
@@ -447,15 +453,31 @@ function AppearanceSettings({ theme }) {
 
 function ToggleRow({ label, sub, checked, onChange }) {
     return (
-        <div className="flex items-center justify-between p-5 md:p-6 bg-[#050B14] border border-gray-800 rounded-2xl hover:border-gray-600 transition-colors shadow-sm group cursor-pointer" onClick={onChange}>
+        <div 
+            className="flex items-center justify-between p-5 md:p-6 bg-white border border-[#E9E1DC] rounded-2xl hover:border-[#D8D5CE] hover:bg-[#FBF9F4] transition-colors shadow-sm group cursor-pointer" 
+            onClick={onChange}
+            role="switch"
+            aria-checked={checked}
+            tabIndex={0}
+            onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    onChange();
+                }
+            }}
+        >
             <div>
-                <p className="font-bold text-white tracking-wide mb-1 group-hover:text-primary transition-colors">{label}</p>
-                <p className="text-sm text-gray-500 font-medium">{sub}</p>
+                <p className="font-bold text-text-primary tracking-wide mb-1 group-hover:text-[#3F7655] transition-colors text-[15px]">{label}</p>
+                <p className="text-[13px] text-text-secondary font-medium">{sub}</p>
             </div>
             <div
-                className={`w-14 h-7 flex items-center rounded-full p-1 transition-all duration-300 shadow-inner ${checked ? 'bg-primary shadow-[0_0_15px_rgba(37,99,235,0.4)]' : 'bg-gray-800'}`}
+                className={`w-[46px] h-[26px] flex items-center rounded-full p-1 shadow-inner ${checked ? 'bg-[#3F7655]' : 'bg-[#D8D5CE]'}`}
+                style={{ transition: 'background-color 160ms ease-in-out' }}
             >
-                <div className={`bg-white w-5 h-5 rounded-full shadow-md transform transition-transform duration-300 ${checked ? 'translate-x-7' : 'translate-x-0'}`}></div>
+                <div 
+                    className={`bg-white w-[18px] h-[18px] rounded-full shadow-md transform ${checked ? 'translate-x-[20px]' : 'translate-x-0'}`}
+                    style={{ transition: 'transform 160ms ease-in-out' }}
+                ></div>
             </div>
         </div>
     );
