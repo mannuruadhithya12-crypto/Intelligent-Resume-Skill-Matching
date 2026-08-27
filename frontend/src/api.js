@@ -179,3 +179,20 @@ export const getLoginHistory = async () => {
     });
     return response.data;
 };
+
+// --- Google Calendar Integration ---
+
+export const getGoogleAuthUrl = async () => {
+    const response = await api.get('/google/auth-url');
+    return response.data;
+};
+
+export const getGoogleStatus = async () => {
+    const response = await api.get('/google/status');
+    return response.data;
+};
+
+export const disconnectGoogle = async () => {
+    const response = await api.post('/google/disconnect');
+    return response.data;
+};

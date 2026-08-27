@@ -14,3 +14,7 @@ uvicorn
 python-multipart
 python-jose[cryptography]
 passlib[bcrypt]
+google-auth
+google-auth-oauthlib
+google-api-python-client
+cryptography

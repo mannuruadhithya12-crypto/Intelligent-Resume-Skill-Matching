@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { FiSave, FiUser, FiBell, FiLock, FiShield, FiMonitor, FiCheck, FiArrowLeft, FiX, FiActivity, FiGlobe } from 'react-icons/fi';
-import { getSettings, updateSettings, changePassword, getLoginHistory } from '../api';
+import { FiSave, FiUser, FiBell, FiLock, FiShield, FiMonitor, FiCheck, FiArrowLeft, FiX, FiActivity, FiGlobe, FiLink } from 'react-icons/fi';
+import { getSettings, updateSettings, changePassword, getLoginHistory, getGoogleAuthUrl, getGoogleStatus, disconnectGoogle } from '../api';
 import { useTheme } from '../context/ThemeContext';
 
 export default function SettingsPage() {
@@ -50,6 +50,10 @@ export default function SettingsPage() {
                         icon={<FiMonitor size={18} />} label="Workspace UI" active={activeTab === 'appearance'}
                         onClick={() => setActiveTab('appearance')}
                     />
+                    <SidebarItem
+                        icon={<FiLink size={18} />} label="Integrations" active={activeTab === 'integrations'}
+                        onClick={() => setActiveTab('integrations')}
+                    />
                 </div>
 
                 {/* Content Area */}
@@ -58,6 +62,7 @@ export default function SettingsPage() {
                     {activeTab === 'notifications' && <NotificationSettings />}
                     {activeTab === 'security' && <SecuritySettings />}
                     {activeTab === 'appearance' && <AppearanceSettings theme={theme} />}
+                    {activeTab === 'integrations' && <IntegrationsSettings />}
                 </div>
             </div>
         </div>
@@ -478,6 +483,181 @@ function ToggleRow({ label, sub, checked, onChange }) {
                     className={`bg-white w-[18px] h-[18px] rounded-full shadow-md transform ${checked ? 'translate-x-[20px]' : 'translate-x-0'}`}
                     style={{ transition: 'transform 160ms ease-in-out' }}
                 ></div>
+            </div>
+        </div>
+    );
+}
+
+// --- Integrations Settings ---
+
+function IntegrationsSettings() {
+    const [googleStatus, setGoogleStatus] = useState({ connected: false, google_email: null, connected_at: null });
+    const [loading, setLoading] = useState(true);
+    const [actionLoading, setActionLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [success, setSuccess] = useState(null);
+
+    useEffect(() => {
+        fetchGoogleStatus();
+
+        // Check URL params for OAuth callback redirect
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('google_connected') === 'true') {
+            setSuccess('Google Calendar connected successfully!');
+            // Clean URL
+            window.history.replaceState({}, '', '/settings');
+            fetchGoogleStatus();
+        } else if (params.get('google_connected') === 'false') {
+            setError(`Failed to connect Google Calendar: ${params.get('error') || 'Unknown error'}`);
+            window.history.replaceState({}, '', '/settings');
+        }
+    }, []);
+
+    const fetchGoogleStatus = async () => {
+        try {
+            const status = await getGoogleStatus();
+            setGoogleStatus(status);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleConnect = async () => {
+        setActionLoading(true);
+        setError(null);
+        try {
+            const data = await getGoogleAuthUrl();
+            if (data.auth_url) {
+                window.location.href = data.auth_url;
+            } else {
+                setError('Failed to generate Google authorization URL.');
+            }
+        } catch (err) {
+            const detail = err?.response?.data?.detail;
+            setError(detail || 'Failed to initiate Google connection.');
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    const handleDisconnect = async () => {
+        setActionLoading(true);
+        setError(null);
+        try {
+            await disconnectGoogle();
+            setGoogleStatus({ connected: false, google_email: null, connected_at: null });
+            setSuccess('Google Calendar disconnected.');
+            setTimeout(() => setSuccess(null), 3000);
+        } catch (err) {
+            setError('Failed to disconnect Google Calendar.');
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    return (
+        <div className="animate-fade-in max-w-xl">
+            <h3 className="text-2xl font-serif font-black text-text-primary mb-2 tracking-tight">Integrations</h3>
+            <p className="text-text-secondary font-medium mb-8">Connect external services to enhance your recruitment workflow.</p>
+
+            {error && (
+                <div className="mb-6 p-4 bg-[#FFF4F4] text-[#C63B3B] border border-[#F2D7D7] rounded-xl text-[14px] font-medium flex items-start gap-2">
+                    <span className="material-symbols-outlined text-[18px] mt-0.5">error</span>
+                    <p>{error}</p>
+                </div>
+            )}
+
+            {success && (
+                <div className="mb-6 p-4 bg-[#EDF5E8] text-[#3F7655] border border-[#C9DEC2] rounded-xl text-[14px] font-medium flex items-start gap-2">
+                    <span className="material-symbols-outlined text-[18px] mt-0.5">check_circle</span>
+                    <p>{success}</p>
+                </div>
+            )}
+
+            {/* Google Calendar Card */}
+            <div className="bg-[#FAFAF7] border border-[#E9E1DC] rounded-[16px] p-6">
+                <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-white border border-[#E5DED4] rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm">
+                        <span className="text-[24px]">📅</span>
+                    </div>
+                    <div className="flex-1">
+                        <h4 className="text-[16px] font-bold text-text-primary mb-1">Google Calendar</h4>
+                        <p className="text-[13px] text-text-secondary mb-4">
+                            Connect your Google Calendar to automatically create Google Meet interviews and send calendar invitations to candidates.
+                        </p>
+
+                        {loading ? (
+                            <div className="flex items-center gap-2 text-[13px] text-text-secondary">
+                                <div className="w-4 h-4 border-2 border-[#E5DED4] border-t-primary-sage rounded-full animate-spin"></div>
+                                Checking connection...
+                            </div>
+                        ) : googleStatus.connected ? (
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-2 text-[14px] text-[#3F7655] font-semibold">
+                                    <span className="material-symbols-outlined text-[18px]">check_circle</span>
+                                    Connected
+                                </div>
+                                {googleStatus.google_email && (
+                                    <div className="text-[13px] text-text-secondary">
+                                        <span className="font-medium text-text-primary">{googleStatus.google_email}</span>
+                                    </div>
+                                )}
+                                <button
+                                    onClick={handleDisconnect}
+                                    disabled={actionLoading}
+                                    className="mt-2 px-4 py-2 bg-white border border-[#D9D2C8] text-[#C63B3B] text-[13px] font-semibold rounded-[10px] hover:bg-[#FFF4F4] hover:border-[#F2D7D7] transition-all disabled:opacity-50"
+                                >
+                                    {actionLoading ? 'Disconnecting...' : 'Disconnect'}
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-2 text-[14px] text-text-secondary">
+                                    <span className="material-symbols-outlined text-[18px]">link_off</span>
+                                    Not connected
+                                </div>
+                                <button
+                                    onClick={handleConnect}
+                                    disabled={actionLoading}
+                                    className="px-5 py-2.5 bg-[#3F7655] text-white text-[13px] font-semibold rounded-[10px] hover:bg-[#315F44] transition-all disabled:opacity-50 flex items-center gap-2"
+                                >
+                                    {actionLoading ? (
+                                        <>
+                                            <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin"></div>
+                                            Connecting...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <span className="material-symbols-outlined text-[18px]">add_link</span>
+                                            Connect Google Calendar
+                                        </>
+                                    )}
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Permissions Info */}
+                <div className="mt-5 pt-4 border-t border-[#E9E1DC]">
+                    <p className="text-[11px] font-bold text-[#746E66] uppercase tracking-wider mb-2">Permissions</p>
+                    <div className="space-y-1.5 text-[12px] text-[#706A62]">
+                        <div className="flex items-center gap-2">
+                            <span className="material-symbols-outlined text-[14px] text-[#3F7655]">check</span>
+                            Create calendar events
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span className="material-symbols-outlined text-[14px] text-[#3F7655]">check</span>
+                            Create Google Meet conferences
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span className="material-symbols-outlined text-[14px] text-[#3F7655]">check</span>
+                            Send calendar invitations to candidates
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );
