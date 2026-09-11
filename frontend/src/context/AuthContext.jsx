@@ -126,8 +126,8 @@ export const AuthProvider = ({ children }) => {
                 headers: { 'Content-Type': 'application/json' }
             });
 
-            // Return success without auto-login
-            return true;
+            // Automatically log the user in after registration
+            return await login(email, password);
 
         } catch (err) {
             console.error("Registration failed", err);

@@ -95,7 +95,7 @@ const LoginPage = () => {
                             </div>
                         </div>
 
-                        <div className="pt-2">
+                        <div className="pt-2 space-y-3">
                             <button
                                 type="submit"
                                 disabled={loading}
@@ -103,6 +103,18 @@ const LoginPage = () => {
                             >
                                 {loading ? 'Signing In...' : 'Sign In'}
                                 <span className="material-symbols-outlined text-[20px]">login</span>
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setEmail('admin@company.com');
+                                    setPassword('admin123');
+                                }}
+                                className="w-full h-[44px] text-[13px] font-bold text-text-secondary bg-[#F4F1EA] hover:bg-[#E9E1DC] rounded-[10px] transition-colors flex justify-center items-center gap-2"
+                            >
+                                <span className="material-symbols-outlined text-[18px]">key</span>
+                                Fill Demo Admin Credentials
                             </button>
                         </div>
                     </form>

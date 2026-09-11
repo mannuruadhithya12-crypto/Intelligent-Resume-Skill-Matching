@@ -21,7 +21,7 @@ const RecruiterSignup = () => {
         e.preventDefault();
         const success = await register(email, password, fullName, company);
         if (success) {
-            navigate('/login');
+            navigate('/');
         }
     };
 
