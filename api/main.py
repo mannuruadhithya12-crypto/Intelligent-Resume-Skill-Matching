@@ -46,6 +46,19 @@ app = FastAPI(
     version="2.0.0"
 )
 
+# Ensure databases are initialized at startup
+@app.on_event("startup")
+def startup_db_init():
+    try:
+        from api.auth_utils import init_db
+        from api.history_db import init_history_db
+        from api.interview_db import init_interview_table
+        init_db()
+        init_history_db()
+        init_interview_table()
+    except Exception as e:
+        print(f"Startup DB init exception: {e}")
+
 # Include authentication router
 app.include_router(auth_router)
 app.include_router(interview_router)
@@ -57,6 +70,7 @@ allowed_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://loc
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
+    allow_origin_regex=r"https?://.*",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

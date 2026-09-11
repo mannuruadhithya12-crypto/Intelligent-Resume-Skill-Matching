@@ -121,15 +121,27 @@ class UserResponse(BaseModel):
     company_id: Optional[int] = None
     disabled: bool = False
 
-# --- Database Utils ---
+_db_initialized = False
+
 def get_db_connection():
+    global _db_initialized
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
+    if not _db_initialized:
+        try:
+            c = conn.cursor()
+            c.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='users'")
+            if not c.fetchone():
+                init_db()
+            _db_initialized = True
+        except Exception:
+            pass
     return conn
 
 def init_db():
     """Initialize database with users and companies tables"""
-    conn = get_db_connection()
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
     c = conn.cursor()
     
     # Companies table for multi-tenant support
