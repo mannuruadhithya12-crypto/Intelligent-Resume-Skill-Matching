@@ -3,7 +3,6 @@ Named Entity Recognition (NER) Extractor
 Extracts structured entities from resumes: companies, certifications, projects, locations
 """
 
-import spacy
 import re
 
 class NERExtractor:
@@ -13,14 +12,18 @@ class NERExtractor:
     """
     
     def __init__(self):
-        """Initialize spaCy NER model"""
+        """Initialize spaCy NER model safely with fallback"""
+        self.nlp = None
         try:
-            self.nlp = spacy.load("en_core_web_sm")
-        except OSError:
-            print("Downloading spaCy model...")
-            import subprocess
-            subprocess.run(["python", "-m", "spacy", "download", "en_core_web_sm"])
-            self.nlp = spacy.load("en_core_web_sm")
+            import spacy
+            try:
+                self.nlp = spacy.load("en_core_web_sm")
+            except Exception:
+                import subprocess
+                subprocess.run(["python", "-m", "spacy", "download", "en_core_web_sm"])
+                self.nlp = spacy.load("en_core_web_sm")
+        except Exception:
+            self.nlp = None
     
     def extract_entities(self, text):
         """
@@ -29,7 +32,7 @@ class NERExtractor:
         Returns:
             Dictionary with extracted entities
         """
-        doc = self.nlp(text)
+        doc = self.nlp(text) if self.nlp else None
         
         entities = {
             'organizations': self._extract_organizations(doc),
@@ -43,6 +46,8 @@ class NERExtractor:
     
     def _extract_organizations(self, doc):
         """Extract company/organization names"""
+        if not doc:
+            return []
         orgs = []
         for ent in doc.ents:
             if ent.label_ == "ORG":
@@ -82,6 +87,8 @@ class NERExtractor:
     
     def _extract_locations(self, doc):
         """Extract location entities"""
+        if not doc:
+            return []
         locations = []
         for ent in doc.ents:
             if ent.label_ in ["GPE", "LOC"]:
@@ -90,6 +97,8 @@ class NERExtractor:
     
     def _extract_dates(self, doc):
         """Extract date entities (useful for experience timeline)"""
+        if not doc:
+            return []
         dates = []
         for ent in doc.ents:
             if ent.label_ == "DATE":
@@ -133,7 +142,7 @@ class NERExtractor:
             companies.extend(matches)
         
         # Also use spaCy ORG entities
-        doc = self.nlp(text)
+        doc = self.nlp(text) if self.nlp else None
         companies.extend(self._extract_organizations(doc))
         
         return list(set(companies))

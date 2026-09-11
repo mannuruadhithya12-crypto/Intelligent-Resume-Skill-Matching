@@ -1,6 +1,5 @@
 
 import re
-import spacy
 from typing import Dict, List, Any
 
 class ComprehensiveParser:
@@ -14,12 +13,17 @@ class ComprehensiveParser:
     """
 
     def __init__(self):
+        self.nlp = None
         try:
-            self.nlp = spacy.load("en_core_web_sm")
-        except OSError:
-            import subprocess
-            subprocess.run(["python", "-m", "spacy", "download", "en_core_web_sm"])
-            self.nlp = spacy.load("en_core_web_sm")
+            import spacy
+            try:
+                self.nlp = spacy.load("en_core_web_sm")
+            except Exception:
+                import subprocess
+                subprocess.run(["python", "-m", "spacy", "download", "en_core_web_sm"])
+                self.nlp = spacy.load("en_core_web_sm")
+        except Exception:
+            self.nlp = None
 
     def parse(self, text: str) -> Dict[str, Any]:
         """Run all extractions and return a structured dictionary"""
@@ -64,19 +68,20 @@ class ComprehensiveParser:
             if match: info["github"] = match.group(0)
 
         # Probable Name (First PERSON entity, typically at start)
-        doc = self.nlp(text[:1000]) # Scan first 1000 chars for name
-        for ent in doc.ents:
-            if ent.label_ == "PERSON":
-                # Filter out obvious non-names if needed
-                if len(ent.text.split()) >= 2:
-                    info["name"] = ent.text
+        if self.nlp:
+            doc = self.nlp(text[:1000]) # Scan first 1000 chars for name
+            for ent in doc.ents:
+                if ent.label_ == "PERSON":
+                    # Filter out obvious non-names if needed
+                    if len(ent.text.split()) >= 2:
+                        info["name"] = ent.text
+                        break
+            
+            # Location (First GPE)
+            for ent in doc.ents:
+                if ent.label_ == "GPE":
+                    info["location"] = ent.text
                     break
-        
-        # Location (First GPE)
-        for ent in doc.ents:
-            if ent.label_ == "GPE":
-                info["location"] = ent.text
-                break
 
         return info
 
@@ -112,11 +117,12 @@ class ComprehensiveParser:
                         edu_entry["year"] = year_match.group(0)
 
                     # Search for ORG in context
-                    doc = self.nlp(context)
-                    for ent in doc.ents:
-                        if ent.label_ == "ORG" and "University" in ent.text or "College" in ent.text or "Institute" in ent.text:
-                            edu_entry["institution"] = ent.text
-                            break
+                    if self.nlp:
+                        doc = self.nlp(context)
+                        for ent in doc.ents:
+                            if ent.label_ == "ORG" and ("University" in ent.text or "College" in ent.text or "Institute" in ent.text):
+                                edu_entry["institution"] = ent.text
+                                break
                     
                     # Avoid duplicates
                     if not any(e['degree'] == edu_entry['degree'] for e in education):
@@ -152,13 +158,14 @@ class ComprehensiveParser:
                 # Context scan
                 context_block = lines[max(0,i-2):min(len(lines), i+2)]
                 context_text = " ".join(context_block)
-                doc = self.nlp(context_text)
-                
-                # Find ORG (Company)
-                for ent in doc.ents:
-                    if ent.label_ == "ORG":
-                        exp_entry["company"] = ent.text
-                        break
+                if self.nlp:
+                    doc = self.nlp(context_text)
+                    
+                    # Find ORG (Company)
+                    for ent in doc.ents:
+                        if ent.label_ == "ORG":
+                            exp_entry["company"] = ent.text
+                            break
                         
                 # Heuristic for Role/Title (keywords)
                 role_keywords = ["Engineer", "Developer", "Manager", "Analyst", "Consultant", "Director", "Lead", "Intern"]

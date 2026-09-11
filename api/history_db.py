@@ -5,11 +5,24 @@ Stores analysis jobs with 24-hour retention and detailed metrics
 
 import sqlite3
 import json
+import os
+import shutil
 from datetime import datetime, timedelta
 from typing import List, Dict, Optional
 from pathlib import Path
 
-DB_PATH = "analysis_history.db"
+def get_db_path(filename="analysis_history.db"):
+    if os.getenv("VERCEL") or os.getenv("DB_PATH_TMP"):
+        tmp_path = os.path.join("/tmp", filename)
+        if not os.path.exists(tmp_path) and os.path.exists(filename):
+            try:
+                shutil.copyfile(filename, tmp_path)
+            except Exception:
+                pass
+        return tmp_path
+    return os.getenv("HISTORY_DB_PATH", filename)
+
+DB_PATH = get_db_path("analysis_history.db")
 
 def init_history_db():
     """Initialize analysis history database"""

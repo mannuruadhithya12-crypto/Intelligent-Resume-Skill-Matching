@@ -6,6 +6,9 @@ Tests all 22 implemented features
 import sys
 from pathlib import Path
 
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8')
+
 # Add project root to path
 sys.path.append(str(Path(__file__).parent))
 

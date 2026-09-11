@@ -16,7 +16,20 @@ from enum import Enum
 SECRET_KEY = os.getenv("SECRET_KEY", "your-very-secret-key-change-this-in-production")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 24 hours
-DB_PATH = "users.db"
+import shutil
+
+def get_auth_db_path(filename="users.db"):
+    if os.getenv("VERCEL") or os.getenv("DB_PATH_TMP"):
+        tmp_path = os.path.join("/tmp", filename)
+        if not os.path.exists(tmp_path) and os.path.exists(filename):
+            try:
+                shutil.copyfile(filename, tmp_path)
+            except Exception:
+                pass
+        return tmp_path
+    return os.getenv("USERS_DB_PATH", filename)
+
+DB_PATH = get_auth_db_path("users.db")
 
 pwd_context = CryptContext(schemes=["pbkdf2_sha256"], deprecated="auto")
 
