@@ -29,14 +29,17 @@ api.interceptors.request.use((config) => {
     return config;
 });
 
-// Intercept 401 Unauthorized responses to force logout
+// Intercept 401 Unauthorized responses to force logout (only if not already on login page)
 api.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response && error.response.status === 401) {
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-            window.location.href = '/login';
+            const isAuthEndpoint = error.config?.url?.includes('/auth/token') || error.config?.url?.includes('/auth/signup');
+            if (!isAuthEndpoint && typeof window !== 'undefined' && window.location.pathname !== '/login') {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                window.location.href = '/login';
+            }
         }
         return Promise.reject(error);
     }
@@ -58,14 +61,17 @@ authApi.interceptors.request.use((config) => {
     return config;
 });
 
-// Setup 401 response handling for auth instance as well
+// Setup 401 response handling for auth instance
 authApi.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response && error.response.status === 401) {
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-            window.location.href = '/login';
+            const isAuthEndpoint = error.config?.url?.includes('/auth/token') || error.config?.url?.includes('/auth/signup');
+            if (!isAuthEndpoint && typeof window !== 'undefined' && window.location.pathname !== '/login') {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                window.location.href = '/login';
+            }
         }
         return Promise.reject(error);
     }

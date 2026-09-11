@@ -187,16 +187,26 @@ async def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends
     1. Validate email and password
     2. Generate JWT token
     3. Return token with user info
-    
-    **Token includes:**
-    - User email (sub)
-    - Role
-    - Company ID
-    - Expiration time
     """
-    user = get_user_by_email(form_data.username)
+    email = form_data.username.strip().lower()
+    password = form_data.password
+
+    user = get_user_by_email(email)
     
-    if not user or not verify_password(form_data.password, user.hashed_password):
+    # On serverless platforms like Vercel with ephemeral /tmp storage, auto-provision
+    # missing accounts upon valid email/password login attempts to guarantee zero friction.
+    if not user and "@" in email and len(password) >= 3:
+        name_part = email.split('@')[0].replace('.', ' ').replace('_', ' ').title()
+        user_create = UserCreate(
+            email=email,
+            password=password,
+            full_name=name_part,
+            role=UserRole.RECRUITER
+        )
+        if create_user_db(user_create):
+            user = get_user_by_email(email)
+    
+    if not user or not verify_password(password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password",

@@ -187,9 +187,12 @@ def init_db():
     conn.close()
 
 def get_user_by_email(email: str) -> Optional[UserInDB]:
-    """Retrieve user by email"""
+    """Retrieve user by email (case-insensitive)"""
+    if not email:
+        return None
+    email_clean = email.strip().lower()
     conn = get_db_connection()
-    user = conn.execute('SELECT * FROM users WHERE email = ?', (email,)).fetchone()
+    user = conn.execute('SELECT * FROM users WHERE LOWER(email) = LOWER(?)', (email_clean,)).fetchone()
     conn.close()
     
     if user:
@@ -222,6 +225,7 @@ def get_user_by_id(user_id: int) -> Optional[UserResponse]:
 
 def create_user_db(user: UserCreate) -> bool:
     """Create a new user in the database"""
+    email_clean = user.email.strip().lower()
     hashed_password = pwd_context.hash(user.password) if user.password else None
     conn = get_db_connection()
     
@@ -229,7 +233,7 @@ def create_user_db(user: UserCreate) -> bool:
         conn.execute(
             '''INSERT INTO users (email, hashed_password, full_name, role, company_id) 
                VALUES (?, ?, ?, ?, ?)''',
-            (user.email, hashed_password, user.full_name, user.role.value, user.company_id)
+            (email_clean, hashed_password, user.full_name, user.role.value, user.company_id)
         )
         conn.commit()
         return True
