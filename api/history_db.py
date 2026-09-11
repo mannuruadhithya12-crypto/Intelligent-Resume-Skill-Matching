@@ -23,6 +23,22 @@ def get_db_path(filename="analysis_history.db"):
     return os.getenv("HISTORY_DB_PATH", filename)
 
 DB_PATH = get_db_path("analysis_history.db")
+_history_db_initialized = False
+
+def get_history_conn():
+    global _history_db_initialized
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    if not _history_db_initialized:
+        try:
+            c = conn.cursor()
+            c.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='analysis_jobs'")
+            if not c.fetchone():
+                init_history_db()
+            _history_db_initialized = True
+        except Exception:
+            pass
+    return conn
 
 def init_history_db():
     """Initialize analysis history database"""

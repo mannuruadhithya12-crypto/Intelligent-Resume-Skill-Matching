@@ -77,8 +77,15 @@ app.add_middleware(
 )
 
 # Storage directories
-UPLOAD_DIR = Path("uploads")
-UPLOAD_DIR.mkdir(exist_ok=True)
+def get_upload_dir():
+    if os.getenv("VERCEL") or not os.access(".", os.W_OK):
+        upload_dir = Path("/tmp/uploads")
+    else:
+        upload_dir = Path("uploads")
+    upload_dir.mkdir(parents=True, exist_ok=True)
+    return upload_dir
+
+UPLOAD_DIR = get_upload_dir()
 
 # In-memory job storage (use Redis/DB in production)
 jobs = {}
@@ -277,18 +284,24 @@ async def start_analysis(
     background_tasks: BackgroundTasks,
     current_user: User = Depends(require_recruiter_or_above)
 ):
-
     """ Start analysis for uploaded files """
     if job_id not in jobs:
+        db_job = get_job_by_id(job_id)
+        if db_job:
+            return {"message": "Job already processed", "job_id": job_id}
         raise HTTPException(status_code=404, detail="Job not found")
     
-    if jobs[job_id]['status'] != 'uploaded':
-        raise HTTPException(status_code=400, detail="Job already processing or completed")
+    if jobs[job_id]['status'] == 'completed':
+        return {"message": "Job already completed", "job_id": job_id}
     
-    # Start background processing
-    background_tasks.add_task(process_analysis, job_id)
+    # Process analysis to completion (required for Vercel serverless execution)
+    process_analysis(job_id)
     
-    return {"message": "Analysis started", "job_id": job_id}
+    if jobs[job_id]['status'] == 'failed':
+        error_msg = jobs[job_id].get('error', 'Unknown error during analysis')
+        raise HTTPException(status_code=500, detail=f"Analysis failed: {error_msg}")
+    
+    return {"message": "Analysis completed", "job_id": job_id}
 
 @app.get("/api/status/{job_id}", response_model=JobStatus)
 async def get_job_status(job_id: str):
